@@ -1,0 +1,55 @@
+omniloader.transforms.mix
+=========================
+
+.. py:module:: omniloader.transforms.mix
+
+.. autoapi-nested-parse::
+
+   MixUp / CutMix as a collate-time wrapper.
+
+   Cross-sample mixing must happen at the batch level, so this is a *collator* that
+   wraps a base collate function rather than a per-sample :class:`Transform`. It mixes
+   only the input **feature** tensors and emits the metadata a training loop needs to
+   compute the mixed loss itself — the paired (shuffled) targets ``<target>_b``, the
+   mixing coefficient ``mixup_lambda`` and the permutation ``mixup_index``. No loss
+   logic lives here, keeping the library strictly data-side.
+
+   * ``mode="mixup"`` — convex blend ``lam * x + (1 - lam) * x[perm]``.
+   * ``mode="cutmix"`` — replace a contiguous time span of each sequence with the
+     permuted sample's span; ``mixup_lambda`` is the retained fraction.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.transforms.mix.MixupCollator
+
+
+Module Contents
+---------------
+
+.. py:class:: MixupCollator(base_collate: Any, schema: omniloader.schema.spec.UnifiedSchema, alpha: float = 0.2, mode: str = 'mixup', p: float = 1.0, seed: int = 0)
+
+   Wrap a base collator to apply MixUp/CutMix to feature tensors.
+
+   :param base_collate: The collator producing the batched dict (e.g.
+                        :func:`~omniloader.collate.unified_collate` or
+                        :class:`~omniloader.collate.DynamicCollator`).
+   :param schema: The unified schema, used to pick feature/target keys.
+   :param alpha: Beta distribution parameter; ``lam ~ Beta(alpha, alpha)``.
+   :param mode: ``"mixup"`` (blend) or ``"cutmix"`` (span replacement).
+   :param p: Per-batch probability of applying mixing (otherwise passthrough).
+   :param seed: Seed for the internal NumPy RNG (deterministic across the run).
+
+   :raises ValueError: If ``mode`` is not ``"mixup"`` or ``"cutmix"``.
+
+
+   .. py:method:: __call__(batch: collections.abc.Sequence[dict[str, Any]]) -> dict[str, Any]
+
+      Collate then mix; adds ``mixup_lambda``, ``mixup_index`` and ``<t>_b``.
+
+
+

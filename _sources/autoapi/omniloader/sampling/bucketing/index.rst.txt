@@ -1,0 +1,98 @@
+omniloader.sampling.bucketing
+=============================
+
+.. py:module:: omniloader.sampling.bucketing
+
+.. autoapi-nested-parse::
+
+   Length-bucketed batching to minimize padding waste.
+
+   :class:`LengthBucketBatchSampler` wraps an index sampler (e.g.
+   :class:`~omniloader.sampling.sampler.OmniSampler`) and a per-sample length array,
+   and yields *batches* of indices whose sequences have similar length. Used as
+   ``DataLoader(batch_sampler=...)`` together with
+   :class:`~omniloader.collate.DynamicCollator`, it keeps each batch's padded length
+   close to its true length.
+
+   The classic pooling scheme is used: the sampler's index stream is cut into pools
+   of ``batch_size * bucket_multiplier``; each pool is sorted by length and split
+   into batches; the batch order is then shuffled so length still varies across
+   steps (only within-batch length is homogenised).
+
+   This only reduces padding waste in the **native-length** regime
+   (``OmniLoader(pad_features=False)`` + :class:`~omniloader.collate.DynamicCollator`).
+   When every sample is padded/cropped to a fixed ``time_dim`` the batches are already
+   equal length, so grouping by length changes no shapes and bucketing is a no-op.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.sampling.bucketing.SizedSampler
+   omniloader.sampling.bucketing.LengthBucketBatchSampler
+
+
+Module Contents
+---------------
+
+.. py:class:: SizedSampler
+
+   Bases: :py:obj:`Protocol`
+
+
+   An index sampler that reports its length (as PyTorch samplers do).
+
+
+   .. py:method:: __iter__() -> collections.abc.Iterator[int]
+
+      Iterate the sampler's indices.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Number of indices produced per epoch.
+
+
+
+.. py:class:: LengthBucketBatchSampler(sampler: SizedSampler, lengths: collections.abc.Sequence[int], batch_size: int, bucket_multiplier: int = 100, drop_last: bool = False, shuffle: bool = True, seed: int = 0)
+
+   Bases: :py:obj:`torch.utils.data.Sampler`\ [\ :py:obj:`list`\ [\ :py:obj:`int`\ ]\ ]
+
+
+   Yield batches of indices grouped by sequence length.
+
+   Only meaningful in the native-length regime (``pad_features=False`` +
+   :class:`~omniloader.collate.DynamicCollator`); under a fixed ``time_dim`` all
+   batches are already equal length and this changes nothing.
+
+   :param sampler: An index sampler yielding global indices (its length defines the
+                   epoch size). If it exposes an ``epoch`` attribute, it seeds the batch
+                   shuffle for reproducibility across epochs.
+   :param lengths: Per-index sequence lengths, indexable by the sampler's indices
+                   (e.g. from :meth:`~omniloader.loader.OmniLoader.sequence_lengths`).
+   :param batch_size: Number of samples per batch.
+   :param bucket_multiplier: Pool size in batches; larger pools bucket more tightly
+                             but reduce cross-length shuffling.
+   :param drop_last: Drop a trailing batch smaller than ``batch_size``.
+   :param shuffle: Shuffle the order of the produced batches each epoch.
+   :param seed: Base seed for the batch-order shuffle.
+
+   :raises ValueError: If ``batch_size`` or ``bucket_multiplier`` is not positive.
+
+
+   .. py:method:: __iter__() -> collections.abc.Iterator[list[int]]
+
+      Iterate length-bucketed batches for the current epoch.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Number of batches produced per epoch.
+
+
+

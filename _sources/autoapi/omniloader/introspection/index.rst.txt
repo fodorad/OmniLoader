@@ -1,0 +1,104 @@
+omniloader.introspection
+========================
+
+.. py:module:: omniloader.introspection
+
+.. autoapi-nested-parse::
+
+   Introspection helpers: describe a dataset mix and validate it against specs.
+
+   :func:`describe` summarises a collection of datasets — the union schema, which
+   dataset provides which key (the *coverage matrix*), the fraction of valid (non-
+   placeholder) positions per key, and class histograms for integer targets.
+   :func:`validate` dry-runs each dataset, checking that the raw samples it emits
+   match the shape and rank their :class:`~omniloader.schema.spec.TensorSpec`
+   declares — catching schema/data mismatches before training starts.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.introspection.Report
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.introspection.describe
+   omniloader.introspection.validate
+
+
+Module Contents
+---------------
+
+.. py:class:: Report
+
+   A human-readable summary of a dataset mix.
+
+   .. attribute:: names
+
+      Per-dataset names.
+
+   .. attribute:: sizes
+
+      Per-dataset sample counts.
+
+   .. attribute:: union_keys
+
+      Every feature/target key in the union schema.
+
+   .. attribute:: coverage
+
+      ``{dataset_name: {key: provided?}}``.
+
+   .. attribute:: valid_fraction
+
+      ``{key: mean fraction of valid positions}`` (sampled).
+
+   .. attribute:: class_distributions
+
+      ``{target_key: {class_id: count}}`` (sampled).
+
+
+   .. py:method:: __str__() -> str
+
+      Render the report as an aligned text table.
+
+
+
+.. py:function:: describe(datasets: collections.abc.Sequence[omniloader.loader.SizedDataset], schemas: collections.abc.Sequence[omniloader.schema.spec.DatasetSchema], max_samples: int = 64) -> Report
+
+   Summarise a dataset mix into a :class:`Report`.
+
+   :param datasets: The source datasets.
+   :param schemas: One schema per dataset.
+   :param max_samples: Cap on samples read per dataset for the valid-fraction and
+                       class-distribution statistics.
+
+   :returns: The populated :class:`Report`.
+
+
+.. py:function:: validate(datasets: collections.abc.Sequence[omniloader.loader.SizedDataset], schemas: collections.abc.Sequence[omniloader.schema.spec.DatasetSchema], num_samples: int = 4, strict: bool = False) -> list[str]
+
+   Check that each dataset's raw samples match its declared specs.
+
+   For every declared key it verifies the value's rank and trailing feature
+   size against the :class:`~omniloader.schema.spec.TensorSpec` (the sequence
+   length is free — unification pads it). Dtype is not checked because
+   unification casts it.
+
+   :param datasets: The source datasets.
+   :param schemas: One schema per dataset.
+   :param num_samples: Number of samples to probe per dataset.
+   :param strict: When ``True``, raise :class:`ValueError` if any issue is found.
+
+   :returns: A list of human-readable issue strings (empty when everything matches).
+
+   :raises ValueError: If ``strict`` and issues were found.
+
+

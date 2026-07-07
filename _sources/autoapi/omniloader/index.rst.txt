@@ -1,0 +1,49 @@
+omniloader
+==========
+
+.. py:module:: omniloader
+
+.. autoapi-nested-parse::
+
+   OmniLoader: a PyTorch meta data loader for disjoint, multi-task datasets.
+
+   OmniLoader unifies several datasets with heterogeneous annotations into a single
+   masked sample scheme so a model can be trained jointly across all of them. It is
+   modality- and model-agnostic: it reasons only about vectors and sequences. See
+   :class:`~omniloader.loader.OmniLoader` for the entry point.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/omniloader/cli/index
+   /autoapi/omniloader/collate/index
+   /autoapi/omniloader/config/index
+   /autoapi/omniloader/data/index
+   /autoapi/omniloader/integrations/index
+   /autoapi/omniloader/introspection/index
+   /autoapi/omniloader/loader/index
+   /autoapi/omniloader/sampling/index
+   /autoapi/omniloader/schema/index
+   /autoapi/omniloader/templates/index
+   /autoapi/omniloader/transforms/index
+   /autoapi/omniloader/utils/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.__version__
+
+
+Package Contents
+----------------
+
+.. py:data:: __version__
+

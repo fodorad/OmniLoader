@@ -1,0 +1,66 @@
+omniloader.schema.unify
+=======================
+
+.. py:module:: omniloader.schema.unify
+
+.. autoapi-nested-parse::
+
+   Turn heterogeneous raw samples into one unified, masked format.
+
+   :class:`SampleUnifier` maps any raw sample dict onto the full union of features
+   and targets described by a :class:`~omniloader.schema.spec.UnifiedSchema`. Keys the
+   source dataset provides are copied (and, for sequences, padded/cropped to the
+   declared length); keys it lacks are filled with a placeholder tensor and an
+   all-``False`` mask. Every value is paired with a ``<name>_mask`` boolean tensor
+   so downstream code can distinguish real data from padding or placeholders. The
+   module is modality- and model-agnostic: it only ever reasons about vectors and
+   sequences.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.schema.unify.METADATA_KEYS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.schema.unify.SampleUnifier
+
+
+Module Contents
+---------------
+
+.. py:data:: METADATA_KEYS
+   :value: ('dataset', 'subset', 'key')
+
+
+.. py:class:: SampleUnifier(schema: omniloader.schema.spec.UnifiedSchema, pad_features: bool = True)
+
+   Map raw sample dicts onto a shared, fully-masked schema.
+
+   :param schema: The unified schema describing every feature and target.
+   :param pad_features: When ``True`` (default), sequence values longer or shorter
+                        than their declared ``time_dim`` are cropped or padded via
+                        :func:`~omniloader.utils.padding.pad_or_crop_time_dim`. When ``False``,
+                        values are assumed to already match and are copied as-is.
+
+
+   .. py:method:: __call__(sample: collections.abc.Mapping[str, Any]) -> dict[str, Any]
+
+      Unify a single raw sample.
+
+      :param sample: Raw sample dict. May contain any subset of the schema's
+                     keys plus optional ``<name>_mask`` entries and metadata.
+
+      :returns: A dict holding, for every schema key, the value tensor and its
+                ``<name>_mask``, plus any metadata found in the source sample.
+
+
+

@@ -1,0 +1,85 @@
+omniloader.data.factory
+=======================
+
+.. py:module:: omniloader.data.factory
+
+.. autoapi-nested-parse::
+
+   Build datasets and schemas from declarative config entries.
+
+   This lets datasets be described in JSON/YAML (adapter + constructor args +
+   schema) so tools like the CLI and :class:`~omniloader.config.OmniConfig` can
+   assemble a dataset mix without Python glue. Only the registered *data adapters*
+   are ever constructed — never models.
+
+   A dataset entry looks like::
+
+       {
+         "adapter": "hdf5",
+         "args": {"h5_path": "data/mosei.h5", "subset": "train"},
+         "schema": {
+           "features": [{"name": "video", "feature_dim": 1024, "time_dim": 300}],
+           "targets": [{"name": "sentiment", "placeholder": -5.0}]
+         }
+       }
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.data.factory.ADAPTERS
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.data.factory.schema_from_dict
+   omniloader.data.factory.build_dataset
+   omniloader.data.factory.build_datasets
+
+
+Module Contents
+---------------
+
+.. py:data:: ADAPTERS
+   :type:  dict[str, type]
+
+.. py:function:: schema_from_dict(data: collections.abc.Mapping[str, Any]) -> omniloader.schema.spec.DatasetSchema
+
+   Build a :class:`DatasetSchema` from a ``{"features": [...], "targets": [...]}`` dict.
+
+   Each spec dict is forwarded to :class:`TensorSpec`/:class:`TensorSpec`; the
+   ``dtype`` field may be a string name (e.g. ``"int64"``).
+
+   :param data: The schema mapping.
+
+   :returns: The constructed schema.
+
+
+.. py:function:: build_dataset(entry: collections.abc.Mapping[str, Any]) -> tuple[omniloader.loader.SizedDataset, omniloader.schema.spec.DatasetSchema]
+
+   Construct one ``(dataset, schema)`` pair from a config entry.
+
+   :param entry: A dict with ``adapter`` (a key of :data:`ADAPTERS`), ``args`` (the
+                 adapter constructor kwargs) and ``schema``.
+
+   :returns: The dataset instance and its schema.
+
+   :raises ValueError: If ``adapter`` is not registered.
+
+
+.. py:function:: build_datasets(entries: collections.abc.Sequence[collections.abc.Mapping[str, Any]]) -> tuple[list[omniloader.loader.SizedDataset], list[omniloader.schema.spec.DatasetSchema]]
+
+   Construct parallel lists of datasets and schemas from config entries.
+
+   :param entries: A list of dataset entries (see :func:`build_dataset`).
+
+   :returns: A ``(datasets, schemas)`` tuple ready for
+             :class:`~omniloader.loader.OmniLoader`.
+
+

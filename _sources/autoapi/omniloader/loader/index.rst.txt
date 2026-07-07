@@ -1,0 +1,178 @@
+omniloader.loader
+=================
+
+.. py:module:: omniloader.loader
+
+.. autoapi-nested-parse::
+
+   The OmniLoader meta-dataset that unifies several disjoint datasets.
+
+   :class:`OmniLoader` concatenates any number of source datasets, each paired with
+   a :class:`~omniloader.schema.spec.DatasetSchema`, and presents them as one dataset whose
+   every sample follows the shared :class:`~omniloader.schema.spec.UnifiedSchema`. Keys a
+   given source lacks are filled with placeholder tensors and all-``False`` masks by
+   the :class:`~omniloader.schema.unify.SampleUnifier`, so a single batch may freely mix
+   samples from different datasets. A :class:`~omniloader.sampling.strategies.MixingStrategy`
+   (obtained via :meth:`OmniLoader.make_sampler`) controls how the datasets are
+   balanced across an epoch.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.loader.SizedDataset
+   omniloader.loader.OmniLoader
+
+
+Module Contents
+---------------
+
+.. py:class:: SizedDataset
+
+   Bases: :py:obj:`Protocol`
+
+
+   A map-style dataset that reports its length and returns dict samples.
+
+
+   .. py:method:: __len__() -> int
+
+      Return the number of samples.
+
+
+
+   .. py:method:: __getitem__(index: int) -> dict[str, Any]
+
+      Return the sample at ``index``.
+
+
+
+.. py:class:: OmniLoader(datasets: collections.abc.Sequence[SizedDataset], schemas: collections.abc.Sequence[omniloader.schema.spec.DatasetSchema], schema: omniloader.schema.spec.UnifiedSchema | None = None, pad_features: bool = True, transform: omniloader.transforms.Transform | None = None, training: bool = True, seed: int = 0)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Unify multiple datasets into a single masked, concatenated dataset.
+
+   :param datasets: The source datasets. Each must implement ``__len__`` and
+                    return a ``dict`` from ``__getitem__``.
+   :param schemas: One :class:`DatasetSchema` per dataset, declaring what it
+                   provides. Merged into a :class:`UnifiedSchema` when ``schema`` is
+                   not given.
+   :param schema: Optional pre-built unified schema. When ``None``, it is the
+                  union of ``schemas``.
+   :param pad_features: Whether the unifier pads/crops sequence values to their
+                        declared ``time_dim``. See :class:`~omniloader.schema.unify.SampleUnifier`.
+   :param transform: Optional per-sample transform (normalization/augmentation)
+                     applied after unification. See :mod:`omniloader.transforms`.
+   :param training: Whether augmentations in ``transform`` are active. Set
+                    ``False`` for validation/test loaders.
+   :param seed: Base seed for per-sample augmentation randomness. Combined with the
+                current epoch (see :meth:`set_epoch`) and the sample index so that
+                augmentation is reproducible and independent of worker count.
+
+   :raises ValueError: If ``datasets`` is empty or its length differs from
+       ``schemas``.
+
+
+   .. py:method:: set_epoch(epoch: int) -> None
+
+      Set the epoch used to seed per-sample augmentation.
+
+      Call once per epoch (the :class:`~omniloader.integrations.lightning.OmniDataModule`
+      does this automatically) so augmentation differs across epochs yet stays
+      reproducible.
+
+      :param epoch: The upcoming epoch number.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Total number of samples across all source datasets.
+
+
+
+   .. py:method:: locate(index: int) -> tuple[int, int]
+
+      Map a global index to ``(dataset_index, local_index)``.
+
+      :param index: Global index in ``[0, len(self))``. Negative indices count
+                    from the end.
+
+      :returns: The owning dataset's position and the local index within it.
+
+      :raises IndexError: If ``index`` is out of range.
+
+
+
+   .. py:method:: __getitem__(index: int) -> dict[str, Any]
+
+      Return the unified sample at a global index.
+
+      :param index: Global index into the concatenated dataset.
+
+      :returns: The sample mapped onto the unified schema with masks and metadata.
+
+
+
+   .. py:method:: describe(max_samples: int = 64) -> omniloader.introspection.Report
+
+      Summarise this loader's datasets (coverage, valid fractions, classes).
+
+      :param max_samples: Samples read per dataset for the statistics.
+
+      :returns: A :class:`~omniloader.introspection.Report`.
+
+
+
+   .. py:method:: validate(num_samples: int = 4, strict: bool = False) -> list[str]
+
+      Check each dataset's raw samples against its declared specs.
+
+      :param num_samples: Samples probed per dataset.
+      :param strict: Raise :class:`ValueError` if any mismatch is found.
+
+      :returns: A list of issue strings (empty when everything matches).
+
+
+
+   .. py:method:: sequence_lengths(key: str) -> list[int]
+
+      Return the native sequence length of ``key`` for every sample.
+
+      Reads each source sample's raw value (bypassing unification/transforms)
+      and reports the length of its sequence axis, or ``0`` when the sample
+      lacks the key. Intended to feed
+      :class:`~omniloader.sampling.bucketing.LengthBucketBatchSampler`.
+
+      .. note::
+
+         This iterates the entire dataset once — ``O(N)`` reads. For HDF5 back
+         ends prefer computing it once and caching the result.
+
+      :param key: A sequence feature or target name.
+
+      :returns: A list of per-sample lengths, indexed by global sample index.
+
+
+
+   .. py:method:: make_sampler(strategy: omniloader.sampling.strategies.MixingStrategy | None = None, seed: int = 0, subsample: collections.abc.Sequence[omniloader.sampling.strategies.SubsampleConfig | None] | None = None, epoch: int = 0) -> omniloader.sampling.sampler.OmniSampler
+
+      Build an :class:`OmniSampler` for driving a ``DataLoader``.
+
+      :param strategy: A mixing strategy. When ``None``, a
+                       :class:`~omniloader.sampling.strategies.ProportionalStrategy` over the
+                       dataset sizes is used.
+      :param seed: Base seed for the default strategy (ignored if ``strategy``
+                   is given).
+      :param subsample: Per-dataset subsample configs for the default strategy.
+      :param epoch: Initial epoch for the sampler.
+
+      :returns: A sampler yielding global indices per epoch.
+
+
+

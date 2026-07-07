@@ -1,0 +1,67 @@
+omniloader.transforms.crop
+==========================
+
+.. py:module:: omniloader.transforms.crop
+
+.. autoapi-nested-parse::
+
+   Sequence cropping transforms (random window for train, center for eval).
+
+   Both crops take a fixed-length window along the sequence axis. A **single shared
+   offset** is applied across every targeted sequence key, so time-aligned features
+   and per-step targets stay in sync. Keys shorter than the requested window are
+   padded back to ``length`` with their placeholder value.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.transforms.crop.RandomCrop
+   omniloader.transforms.crop.CenterCrop
+
+
+Module Contents
+---------------
+
+.. py:class:: RandomCrop(length: int, keys: collections.abc.Sequence[str] | None = None, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Crop a random contiguous window of the sequence (training augmentation).
+
+   :param length: Window length along the sequence axis.
+   :param keys: Sequence keys to crop with a shared offset. When ``None``, every
+                sequence key in the schema (features *and* aligned targets) is
+                cropped together (requires ``schema``).
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Crop all targeted keys at one random offset within the valid region.
+
+
+
+.. py:class:: CenterCrop(length: int, keys: collections.abc.Sequence[str] | None = None, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Crop the centered window of the sequence (deterministic; used for eval).
+
+   :param length: Window length along the sequence axis.
+   :param keys: Sequence keys to crop. When ``None``, every sequence key in the
+                schema is cropped (requires ``schema``).
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Crop all targeted keys at the centered offset within the valid region.
+
+
+

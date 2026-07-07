@@ -1,0 +1,117 @@
+omniloader.transforms.normalize
+===============================
+
+.. py:module:: omniloader.transforms.normalize
+
+.. autoapi-nested-parse::
+
+   Feature normalization transforms.
+
+   All normalizers apply an affine map ``(x - offset) / (scale + eps)`` only where
+   the validity mask is ``True`` — padding and placeholder positions keep their
+   original value. The stats-based variants take precomputed statistics (see
+   :func:`~omniloader.transforms.stats.compute_stats`); :class:`InstanceNormalize`
+   derives them per sample. All run in both training and evaluation.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.transforms.normalize.Normalize
+   omniloader.transforms.normalize.MinMaxNormalize
+   omniloader.transforms.normalize.RobustNormalize
+   omniloader.transforms.normalize.InstanceNormalize
+   omniloader.transforms.normalize.PerDatasetNormalize
+
+
+Module Contents
+---------------
+
+.. py:class:: Normalize(stats: collections.abc.Mapping[str, Any], eps: float = 1e-06)
+
+   Bases: :py:obj:`_StatsNormalizer`
+
+
+   Standardize to zero mean and unit variance from ``(mean, std)`` stats.
+
+
+.. py:class:: MinMaxNormalize(stats: collections.abc.Mapping[str, Any], eps: float = 1e-06)
+
+   Bases: :py:obj:`_StatsNormalizer`
+
+
+   Scale to ``[0, 1]`` from ``(min, max)`` stats (divisor is ``max - min``).
+
+
+.. py:class:: RobustNormalize(stats: collections.abc.Mapping[str, Any], eps: float = 1e-06)
+
+   Bases: :py:obj:`_StatsNormalizer`
+
+
+   Standardize by median and IQR from ``(median, iqr)`` stats (outlier-robust).
+
+
+.. py:class:: InstanceNormalize(keys: collections.abc.Sequence[str] | None = None, eps: float = 1e-06, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Standardize each sample by its own valid statistics (no external stats).
+
+   For a sequence value the mean/std are taken over the valid time steps
+   (per feature); for a vector value, over the feature axis.
+
+   :param keys: Feature keys to normalize. When ``None``, every feature in the
+                schema is used (requires ``schema``).
+   :param eps: Small constant added to the std.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Standardize each key using statistics from its own valid positions.
+
+
+
+.. py:class:: PerDatasetNormalize(stats: collections.abc.Mapping[str, collections.abc.Mapping[str, Any]], fallback: str = 'instance', union_stats: collections.abc.Mapping[str, Any] | None = None, dataset_key: str = 'dataset', eps: float = 1e-06)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Standardize each sample by **its source dataset's** own ``(mean, std)`` stats.
+
+   The remedy for cross-corpus domain shift when training jointly on several
+   datasets that share a feature extractor: each dataset is standardized by its own
+   statistics (see :func:`~omniloader.transforms.stats.compute_dataset_stats`),
+   selected at run time from the ``dataset`` metadata key every unified sample
+   carries. Because per-dataset stats are undefined for a source not seen at
+   training time, a ``fallback`` governs unknown ids — crucial for deploying on new
+   sources:
+
+   * ``"instance"`` — standardize the sample by its own valid statistics (no external
+     stats needed; identical at train and inference);
+   * ``"union"`` — apply the pooled ``union_stats`` (a neutral default);
+   * ``"identity"`` — leave the sample unchanged.
+
+   Never guess another dataset's stats for an unknown source — that would inject that
+   corpus's shift. Runs in both training and evaluation.
+
+   :param stats: Mapping of dataset name to a per-key stats mapping (each an
+                 ``(mean, std)`` pair or a mapping with ``"mean"``/``"std"``).
+   :param fallback: Policy for a sample whose dataset id is not in ``stats``.
+   :param union_stats: Pooled per-key stats, required when ``fallback="union"``.
+   :param dataset_key: Metadata key holding each sample's source-dataset name.
+   :param eps: Small constant added to the divisor.
+
+   :raises ValueError: If ``fallback`` is unknown, or ``"union"`` without ``union_stats``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Normalize ``sample`` by its dataset's stats, or the fallback if unknown.
+
+
+

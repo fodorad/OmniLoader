@@ -1,0 +1,84 @@
+omniloader.sampling.subsamplers
+===============================
+
+.. py:module:: omniloader.sampling.subsamplers
+
+.. autoapi-nested-parse::
+
+   Per-dataset index draws with configurable reuse and exhaustion policies.
+
+   An :class:`IndexPool` produces the local indices to visit within a single
+   dataset for a given epoch. It captures three orthogonal choices:
+
+   * **replacement** — whether a draw may repeat an index within one epoch;
+   * **exhaustion policy** — for without-replacement draws, whether each epoch is a
+     fresh random subsample (``"fresh"``) or whether the pool shuffles through the
+     entire dataset before any index is reused across epochs (``"exhaust"``);
+   * **weights** — optional per-index weights for skewed sampling (e.g. class
+     balancing within a dataset).
+
+   Draws are fully determined by a base ``seed`` and the epoch number, so runs are
+   reproducible.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.sampling.subsamplers.ExhaustionPolicy
+   omniloader.sampling.subsamplers.IndexPool
+
+
+Module Contents
+---------------
+
+.. py:class:: ExhaustionPolicy(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   How without-replacement draws relate across epochs.
+
+   .. attribute:: FRESH
+
+      Every epoch independently samples without replacement from the
+      full dataset; nothing is remembered between epochs.
+
+   .. attribute:: EXHAUST
+
+      Maintain a running shuffled ordering of the whole dataset and
+      consume it across epochs, reshuffling only once every index has been
+      used. This guarantees uniform coverage before any reuse.
+
+
+.. py:class:: IndexPool(size: int, replacement: bool = False, policy: ExhaustionPolicy = ExhaustionPolicy.FRESH, seed: int = 0, weights: collections.abc.Sequence[float] | None = None)
+
+   Draw local indices for one dataset, honouring reuse and exhaustion policy.
+
+   :param size: Number of samples in the dataset.
+   :param replacement: When ``True``, indices may repeat within an epoch and the
+                       exhaustion policy is ignored. Defaults to ``False``.
+   :param policy: The :class:`ExhaustionPolicy` for without-replacement draws.
+   :param seed: Base seed; combined with the epoch to make draws reproducible.
+   :param weights: Optional per-index sampling weights of length ``size`` (e.g.
+                   class-balancing weights). When set, draws are weighted via
+                   ``torch.multinomial`` and the exhaustion policy is bypassed.
+
+   :raises ValueError: If ``size`` is not positive or ``weights`` has a bad length.
+
+
+   .. py:method:: draw(count: int, epoch: int) -> list[int]
+
+      Return ``count`` local indices to visit this epoch.
+
+      :param count: Number of indices requested. May exceed ``size`` when
+                    ``replacement`` is ``True`` or under the ``EXHAUST`` policy
+                    (which wraps across reshuffles).
+      :param epoch: The epoch number, used to seed the draw.
+
+      :returns: A list of ``count`` indices in ``[0, size)``.
+
+
+

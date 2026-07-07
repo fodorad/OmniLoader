@@ -1,0 +1,16 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OmniLoader">
+  <defs>
+    <linearGradient id="ci" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F97316"/>
+      <stop offset="1" stop-color="#EE4C2C"/>
+    </linearGradient>
+  </defs>
+  <!-- three disjoint lanes merging into one unified stream -->
+  <rect x="14" y="38" width="32" height="14" rx="7" fill="#EE4C2C" opacity="0.55"/>
+  <rect x="14" y="68" width="32" height="14" rx="7" fill="#EE4C2C" opacity="0.85"/>
+  <rect x="14" y="98" width="32" height="14" rx="7" fill="#EE4C2C" opacity="0.4"/>
+  <path d="M50 45 C 82 45, 82 75, 108 75" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.55" fill="none"/>
+  <path d="M50 75 H 108" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.85" fill="none"/>
+  <path d="M50 105 C 82 105, 82 75, 108 75" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.4" fill="none"/>
+  <rect x="104" y="64" width="42" height="22" rx="11" fill="url(#ci)"/>
+</svg>

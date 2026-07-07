@@ -1,0 +1,69 @@
+omniloader.data.npy
+===================
+
+.. py:module:: omniloader.data.npy
+
+.. autoapi-nested-parse::
+
+   A dataset over a per-sample ``.npy`` folder layout.
+
+   :class:`NpyFolderDataset` reads the common feature-extraction layout where each
+   sample is a directory of ``.npy`` files, one per named value::
+
+       root/
+         <sample_key>/
+           video.npy
+           audio.npy
+           valence.npy
+           ...
+
+   Arrays are memory-mapped (``mmap_mode="r"``) so large features are not copied into
+   RAM until sliced. Every sample directory is expected to contain the same set of
+   files; the first sample defines the key set unless ``keys`` is given.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.data.npy.NpyFolderDataset
+
+
+Module Contents
+---------------
+
+.. py:class:: NpyFolderDataset(root: str | pathlib.Path, keys: collections.abc.Sequence[str] | None = None, mmap: bool = True)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Read samples from a directory of per-sample ``.npy`` sub-folders.
+
+   :param root: Directory whose immediate sub-directories are samples.
+   :param keys: Optional value names (``.npy`` stems) to load. When ``None``, the
+                files present in the first sample directory define the key set.
+   :param mmap: Memory-map the arrays instead of reading them fully. Defaults to
+                ``True``.
+
+   :raises FileNotFoundError: If ``root`` has no sample sub-directories.
+
+
+   .. py:method:: __len__() -> int
+
+      Number of sample directories.
+
+
+
+   .. py:method:: __getitem__(index: int) -> dict[str, Any]
+
+      Load the sample at ``index`` as a dict of tensors plus its key.
+
+      :param index: Sample position.
+
+      :returns: A dict mapping each key to a tensor, plus a ``key`` metadata string
+                (the sample directory name).
+
+
+

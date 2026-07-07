@@ -1,0 +1,215 @@
+omniloader.schema.spec
+======================
+
+.. py:module:: omniloader.schema.spec
+
+.. autoapi-nested-parse::
+
+   Declarative schema for features and targets across heterogeneous datasets.
+
+   The building blocks here let each dataset declare *what* it provides (features and
+   targets, their shapes, dtypes and placeholder values) without committing to *how*
+   those values are stored or *what modality* they represent. Everything is described
+   in purely structural terms:
+
+   * a **vector** value has no sequence axis — shape ``()`` (a scalar) or ``(F,)``;
+   * a **sequence** value has a leading sequence axis of length ``T`` — shape
+     ``(T,)`` or ``(T, F)``.
+
+   A spec is a sequence exactly when its ``time_dim`` is set; otherwise it is a
+   vector. No modality (video/audio/text/…) or model concept appears anywhere.
+   :class:`UnifiedSchema` merges the per-dataset declarations into the single union
+   schema that :class:`~omniloader.schema.unify.SampleUnifier` uses to bring every raw
+   sample into a common, masked format.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.schema.spec.TensorSpec
+   omniloader.schema.spec.DatasetSchema
+   omniloader.schema.spec.UnifiedSchema
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.schema.spec.resolve_dtype
+
+
+Module Contents
+---------------
+
+.. py:function:: resolve_dtype(dtype: str | torch.dtype) -> torch.dtype
+
+   Resolve a dtype given as a string or :class:`torch.dtype`.
+
+   :param dtype: Either a :class:`torch.dtype` or one of the string keys in
+                 :data:`_DTYPES` (e.g. ``"float32"``).
+
+   :returns: The corresponding :class:`torch.dtype`.
+
+   :raises ValueError: If ``dtype`` is a string that is not a known dtype name.
+
+
+.. py:class:: TensorSpec
+
+   Structural declaration of a single named value (a feature *or* a target).
+
+   The same spec type describes both inputs and supervision targets; its role is
+   determined by whether it is placed in :attr:`DatasetSchema.features` or
+   :attr:`DatasetSchema.targets`.
+
+   The shape is derived from two independent, optional axes:
+
+   * ``time_dim`` — length ``T`` of the sequence axis. When ``None`` the value
+     is a **vector** (no sequence axis); when set the value is a **sequence**.
+   * ``feature_dim`` — size ``F`` of the trailing feature axis. When ``None``
+     the value is a **scalar** along that axis.
+
+   So the four representable shapes are ``()``, ``(F,)``, ``(T,)`` and
+   ``(T, F)`` — covering scalar labels, feature vectors, scalar sequences
+   (e.g. one value per step) and feature sequences.
+
+   :param name: Unique key under which the value appears in a sample dict.
+   :param feature_dim: Size of the trailing feature axis ``F``. ``None`` for a
+                       scalar along that axis.
+   :param time_dim: Length ``T`` of the sequence axis. ``None`` for a vector.
+   :param dtype: Element dtype, as a :class:`torch.dtype` or string name.
+   :param placeholder: Fill value used when a dataset does not provide this key.
+                       Defaults to ``0`` (use e.g. ``-1`` as an ignore index for class ids).
+
+
+   .. py:method:: __post_init__() -> None
+
+      Validate and normalise field values.
+
+
+
+   .. py:property:: is_sequence
+      :type: bool
+
+
+      Whether the value has a sequence axis (``time_dim`` is set).
+
+
+   .. py:property:: value_shape
+      :type: tuple[int, Ellipsis]
+
+
+      Shape of the placeholder value tensor for a single sample.
+
+      :returns: One of ``()``, ``(F,)``, ``(T,)`` or ``(T, F)`` depending on which
+                of ``time_dim`` and ``feature_dim`` are set.
+
+
+   .. py:property:: mask_shape
+      :type: tuple[int, Ellipsis]
+
+
+      Shape of the boolean validity mask for a single sample.
+
+      :returns: ``(T,)`` for a sequence value (one flag per step) and ``()`` for a
+                vector value (one flag for the whole value).
+
+
+   .. py:method:: placeholder_value() -> torch.Tensor
+
+      Build the placeholder value tensor filled with :attr:`placeholder`.
+
+
+
+   .. py:method:: placeholder_mask() -> torch.Tensor
+
+      Build the all-``False`` mask marking every position as invalid.
+
+
+
+.. py:class:: DatasetSchema
+
+   The set of features and targets a single dataset provides.
+
+   A value is a *feature* or a *target* purely by which list it is placed in;
+   both use the same :class:`TensorSpec`.
+
+   :param features: Input feature specs the dataset supplies.
+   :param targets: Supervision target specs the dataset supplies.
+
+
+   .. py:property:: specs
+      :type: list[TensorSpec]
+
+
+      All feature and target specs concatenated.
+
+
+   .. py:property:: keys
+      :type: set[str]
+
+
+      Names of every feature and target the dataset provides.
+
+
+.. py:class:: UnifiedSchema(schemas: list[DatasetSchema])
+
+   Union of several :class:`DatasetSchema` objects into one shared schema.
+
+   The unified schema is the deduplicated union of every feature and target
+   across the input datasets. Specs that share a name must agree on shape and
+   dtype. Order is preserved: features/targets appear in the order they are
+   first encountered.
+
+   :param schemas: Per-dataset schemas to merge.
+
+
+   .. py:property:: specs
+      :type: list[TensorSpec]
+
+
+      All feature and target specs in the unified schema.
+
+
+   .. py:property:: feature_keys
+      :type: list[str]
+
+
+      Names of the input features in schema order.
+
+
+   .. py:property:: target_keys
+      :type: list[str]
+
+
+      Names of the supervision targets in schema order.
+
+
+   .. py:property:: keys
+      :type: set[str]
+
+
+      Names of every feature and target in the unified schema.
+
+
+   .. py:method:: spec(name: str) -> TensorSpec
+
+      Return the spec registered under ``name``.
+
+      :param name: Feature or target name.
+
+      :returns: The matching :class:`TensorSpec`.
+
+      :raises KeyError: If no spec with that name exists.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Number of features plus targets in the unified schema.
+
+
+

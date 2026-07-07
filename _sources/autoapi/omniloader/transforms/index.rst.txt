@@ -1,0 +1,84 @@
+omniloader.transforms
+=====================
+
+.. py:module:: omniloader.transforms
+
+.. autoapi-nested-parse::
+
+   Configurable, per-sample transforms: normalization and augmentation.
+
+   This subpackage groups the transform pipeline used after unification:
+
+   * :mod:`~omniloader.transforms.base` — :class:`Transform`, :class:`Compose` and
+     shared helpers;
+   * :mod:`~omniloader.transforms.normalize` — :class:`Normalize`,
+     :class:`MinMaxNormalize`, :class:`RobustNormalize`, :class:`InstanceNormalize`;
+   * :mod:`~omniloader.transforms.augment` — :class:`GaussianNoise`,
+     :class:`FeatureDropout`, :class:`SpanMasking`, :class:`TimeWarp`,
+     :class:`FeatureMasking`;
+   * :mod:`~omniloader.transforms.crop` — :class:`RandomCrop`, :class:`CenterCrop`;
+   * :mod:`~omniloader.transforms.mix` — :class:`MixupCollator` (collate-time);
+   * :mod:`~omniloader.transforms.stats` — statistics helpers for normalization.
+
+   Compose transforms with :class:`Compose`, or build one from a list of config dicts
+   with :func:`build_transform`.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/omniloader/transforms/augment/index
+   /autoapi/omniloader/transforms/base/index
+   /autoapi/omniloader/transforms/crop/index
+   /autoapi/omniloader/transforms/mix/index
+   /autoapi/omniloader/transforms/normalize/index
+   /autoapi/omniloader/transforms/stats/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.transforms.TRANSFORMS
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.transforms.build_transform
+
+
+Package Contents
+----------------
+
+.. py:data:: TRANSFORMS
+   :type:  dict[str, type[base.Transform]]
+
+.. py:function:: build_transform(configs: collections.abc.Sequence[collections.abc.Mapping[str, Any]], schema: omniloader.schema.spec.UnifiedSchema | None = None) -> base.Compose | None
+
+   Build a :class:`Compose` from a list of transform config dicts.
+
+   Each config dict has a ``name`` (a key of :data:`TRANSFORMS`) and the
+   remaining keys are forwarded as keyword arguments. Schema-aware transforms
+   receive ``schema`` automatically when they declare no explicit ``keys``;
+   stats-based normalizers read their ``stats`` from the config — either inline,
+   or from a saved JSON file via ``stats_path`` (and ``union_stats_path`` for
+   :class:`~omniloader.transforms.normalize.PerDatasetNormalize`), loaded with
+   :func:`~omniloader.transforms.stats.load_stats`. This lets a config reference
+   stats produced once by ``omniloader compute-stats`` instead of inlining them.
+
+   :param configs: A list of transform specifications.
+   :param schema: The unified schema, injected into schema-aware transforms.
+
+   :returns: A :class:`Compose`, or ``None`` if ``configs`` is empty.
+
+   :raises ValueError: If a config names an unknown transform.
+
+

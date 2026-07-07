@@ -1,0 +1,111 @@
+omniloader.data.datasets
+========================
+
+.. py:module:: omniloader.data.datasets
+
+.. autoapi-nested-parse::
+
+   Dataset adapters that yield raw sample dicts for OmniLoader.
+
+   The concrete datasets here (an HDF5-backed reader and an in-memory tensor
+   dataset) implement the loose contract OmniLoader expects: ``__len__`` returns the
+   number of samples and ``__getitem__`` returns a ``dict`` of named values. The
+   :class:`~omniloader.schema.spec.DatasetSchema` describing what a dataset provides is
+   supplied alongside it to :class:`~omniloader.loader.OmniLoader`.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.data.datasets.HDF5Dataset
+   omniloader.data.datasets.DictTensorDataset
+
+
+Module Contents
+---------------
+
+.. py:class:: HDF5Dataset(h5_path: str | pathlib.Path, subset: str, keys: collections.abc.Sequence[str] | None = None, cache_size: int = 0, preload: bool = False)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Read samples from a group of an HDF5 file, one sub-group per sample.
+
+   The file is expected to hold a group named ``subset`` (e.g. ``"train"``)
+   whose children are per-sample groups, each containing the named value
+   datasets (features, targets, masks, metadata). The file handle is opened
+   lazily per worker process so the dataset is safe to use with
+   ``num_workers > 0``.
+
+   :param h5_path: Path to the ``.h5`` file.
+   :param subset: Name of the top-level group to read (e.g. ``"train"``).
+   :param keys: Optional subset of value names to load per sample. When ``None``,
+                every dataset in the sample group is loaded.
+   :param cache_size: If ``> 0``, keep an in-process LRU cache of up to this many
+                      decoded samples to speed up repeated reads.
+   :param preload: If ``True``, decode every sample into memory up front (fastest
+                   for small datasets; uses the most memory).
+
+   :raises KeyError: If ``subset`` is not present in the file.
+
+
+   .. py:method:: __len__() -> int
+
+      Number of samples in the subset.
+
+
+
+   .. py:method:: __getitem__(index: int) -> dict[str, Any]
+
+      Load the sample at ``index`` as a dict of named values.
+
+      :param index: Position within the subset.
+
+      :returns: A dict mapping each stored key to a tensor or string.
+
+
+
+   .. py:method:: __getstate__() -> dict[str, Any]
+
+      Drop the open file handle and cache when pickling (for workers).
+
+
+
+.. py:class:: DictTensorDataset(tensors: collections.abc.Mapping[str, torch.Tensor], metadata: collections.abc.Mapping[str, collections.abc.Sequence[Any]] | None = None)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   In-memory dataset over a dict of stacked tensors, keyed by sample index.
+
+   Useful for tests and small experiments: each entry maps a name to a tensor
+   whose leading dimension is the sample axis. ``__getitem__`` returns the
+   per-sample slice of every tensor as a dict.
+
+   :param tensors: Mapping of value name to a tensor of shape ``(N, ...)`` where
+                   ``N`` is the number of samples (equal across all tensors).
+   :param metadata: Optional mapping of metadata name to a per-sample sequence
+                    (e.g. dataset name or sample key) of length ``N``.
+
+   :raises ValueError: If the tensors disagree on the number of samples.
+
+
+   .. py:method:: __len__() -> int
+
+      Number of samples.
+
+
+
+   .. py:method:: __getitem__(index: int) -> dict[str, Any]
+
+      Return the per-sample slice of every tensor plus metadata.
+
+      :param index: Sample position.
+
+      :returns: A dict of the sample's values and metadata.
+
+
+

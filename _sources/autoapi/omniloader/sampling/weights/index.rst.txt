@@ -1,0 +1,98 @@
+omniloader.sampling.weights
+===========================
+
+.. py:module:: omniloader.sampling.weights
+
+.. autoapi-nested-parse::
+
+   Class-balance helpers for categorical targets.
+
+   Two complementary tools, named for what consumes their output, both counting only
+   valid (unmasked) target positions:
+
+   * :func:`class_weights_for_sampler` — one weight **per sample** for the *sampler*
+     (:class:`~omniloader.sampling.strategies.SubsampleConfig` ``sample_weights``), so an
+     imbalanced dataset is *resampled* toward a flat class histogram.
+   * :func:`class_histogram` / :func:`class_weights_for_loss` — the exact per-class counts
+     and a ``(num_classes,)`` weight vector for a **loss** (e.g. ``CrossEntropyLoss(weight=...)``).
+     These are data-side statistics: compute once, persist
+     (``omniloader class-weights-for-loss``), and reuse — the loss/model that consumes
+     them stays in your training code.
+
+   Unlike the per-sample sampler weights, the histogram/loss weights count **every valid
+   labelled position** (each valid step of a framewise ``(T,)`` target, or the scalar of a
+   vector target), matching what a per-position loss actually sees.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.sampling.weights.class_weights_for_sampler
+   omniloader.sampling.weights.class_histogram
+   omniloader.sampling.weights.class_weights_for_loss
+
+
+Module Contents
+---------------
+
+.. py:function:: class_weights_for_sampler(samples: collections.abc.Iterable[dict[str, torch.Tensor]], target_key: str) -> list[float]
+
+   Compute per-sample inverse-class-frequency weights for a *sampler*.
+
+   Feed the result to a sampler (e.g.
+   :class:`~omniloader.sampling.strategies.SubsampleConfig` ``sample_weights``) to
+   *resample* an imbalanced dataset toward a flat class histogram. The loss-side
+   counterpart is :func:`class_weights_for_loss`.
+
+   :param samples: An iterable of unified sample dicts (e.g. a source dataset or an
+                   :class:`~omniloader.loader.OmniLoader`). Iterated once.
+   :param target_key: A categorical (int) target name; its ``<name>_mask`` is used
+                      to skip invalid positions.
+
+   :returns: A list of per-sample weights (``1 / class_count`` for the sample's class,
+             ``0`` when the sample has no valid target), aligned with ``samples``.
+
+
+.. py:function:: class_histogram(samples: collections.abc.Iterable[dict[str, torch.Tensor]], target_key: str, num_classes: int | None = None) -> torch.Tensor
+
+   Count valid instances of each class for a categorical target.
+
+   :param samples: An iterable of unified sample dicts (a source dataset or an
+                   :class:`~omniloader.loader.OmniLoader`). Iterated once.
+   :param target_key: A categorical (int) target name; its ``<name>_mask`` skips
+                      invalid positions.
+   :param num_classes: Number of classes. When ``None``, inferred as ``max id + 1``
+                       (so classes with zero instances are only included when given explicitly).
+
+   :returns: A ``(num_classes,)`` ``int64`` tensor of per-class counts.
+
+   :raises ValueError: If an observed class id is negative or ``>= num_classes``.
+
+
+.. py:function:: class_weights_for_loss(samples: collections.abc.Iterable[dict[str, torch.Tensor]], target_key: str, num_classes: int | None = None, scheme: str = 'inverse', beta: float = 0.999) -> torch.Tensor
+
+   Compute per-class weights for a *loss* from a categorical target.
+
+   Intended for ``CrossEntropyLoss(weight=...)`` and similar — it *reweights* the
+   loss instead of resampling the data (the sampler-side counterpart is
+   :func:`class_weights_for_sampler`). Weights are normalised so they average ``1``
+   across classes (the loss keeps its scale). Classes with zero instances get
+   weight ``0``.
+
+   :param samples: An iterable of unified sample dicts. Iterated once.
+   :param target_key: A categorical (int) target name.
+   :param num_classes: Number of classes (``None`` infers ``max id + 1``).
+   :param scheme: ``"inverse"`` (inverse frequency ``1 / count``) or ``"effective"``
+                  (effective number of samples, Cui et al. 2019:
+                  ``(1 - beta) / (1 - beta ** count)``).
+   :param beta: Re-weighting strength for ``scheme="effective"`` (closer to ``1`` =
+                stronger balancing).
+
+   :returns: A ``(num_classes,)`` ``float32`` weight tensor.
+
+   :raises ValueError: If ``scheme`` is not ``"inverse"`` or ``"effective"``.
+
+

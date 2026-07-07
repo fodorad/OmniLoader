@@ -1,0 +1,130 @@
+omniloader.transforms.base
+==========================
+
+.. py:module:: omniloader.transforms.base
+
+.. autoapi-nested-parse::
+
+   Transform base classes and shared helpers.
+
+   A :class:`Transform` operates on an already-unified sample dict (the output of
+   :class:`~omniloader.schema.unify.SampleUnifier`) and is modality-agnostic — it
+   reasons only about vectors, sequences and their ``<name>_mask`` companions. Each
+   transform is:
+
+   * **seedable** — an optional :class:`torch.Generator` makes every draw
+     reproducible;
+   * **mask-aware** — values are only altered where the mask is ``True`` (padding
+     and placeholders are left untouched);
+   * **train/eval-aware** — augmentations set ``train_only = True`` so they are
+     skipped during evaluation, while normalization runs in both phases.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.transforms.base.Sample
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.transforms.base.Transform
+   omniloader.transforms.base.Compose
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.transforms.base.broadcast_mask
+   omniloader.transforms.base.resolve_keys
+   omniloader.transforms.base.resolve_sequence_keys
+
+
+Module Contents
+---------------
+
+.. py:data:: Sample
+
+.. py:class:: Transform
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Base class for per-sample transforms.
+
+   .. attribute:: train_only
+
+      When ``True`` the transform is skipped unless ``training``
+      is passed as ``True`` to :meth:`__call__`.
+
+
+   .. py:method:: __call__(sample: Sample, *, training: bool = True, generator: torch.Generator | None = None) -> Sample
+
+      Apply the transform, honouring the train/eval gate.
+
+      :param sample: The unified sample dict to transform.
+      :param training: Whether the pipeline is in training mode.
+      :param generator: Optional RNG for reproducible randomness.
+
+      :returns: The transformed sample (mutated in place and returned).
+
+
+
+   .. py:method:: apply(sample: Sample, generator: torch.Generator | None) -> Sample
+      :abstractmethod:
+
+
+      Transform ``sample`` unconditionally. Subclasses implement this.
+
+
+
+.. py:class:: Compose(transforms: collections.abc.Sequence[Transform])
+
+   Bases: :py:obj:`Transform`
+
+
+   Apply a list of transforms in order.
+
+   :param transforms: The transforms to apply sequentially.
+
+
+   .. py:method:: __call__(sample: Sample, *, training: bool = True, generator: torch.Generator | None = None) -> Sample
+
+      Apply each contained transform in order (each honours its own gate).
+
+
+
+   .. py:method:: apply(sample: Sample, generator: torch.Generator | None) -> Sample
+
+      Apply every contained transform (train gate handled per-transform).
+
+
+
+.. py:function:: broadcast_mask(mask: torch.Tensor, value: torch.Tensor) -> torch.Tensor
+
+   Broadcast a validity mask to the value's shape for ``torch.where``.
+
+   :param mask: Mask of shape ``()`` (vector) or ``(T,)`` (sequence).
+   :param value: Value of shape ``()``, ``(F,)``, ``(T,)`` or ``(T, F)``.
+
+   :returns: A boolean tensor broadcastable to ``value.shape``.
+
+
+.. py:function:: resolve_keys(keys: collections.abc.Sequence[str] | None, schema: omniloader.schema.spec.UnifiedSchema | None) -> list[str]
+
+   Return explicit ``keys`` or all feature keys from ``schema``.
+
+
+.. py:function:: resolve_sequence_keys(keys: collections.abc.Sequence[str] | None, schema: omniloader.schema.spec.UnifiedSchema | None) -> list[str]
+
+   Return explicit ``keys`` or all sequence feature keys from ``schema``.
+
+

@@ -1,0 +1,46 @@
+omniloader.cli
+==============
+
+.. py:module:: omniloader.cli
+
+.. autoapi-nested-parse::
+
+   Command-line interface for inspecting a dataset mix from a config file.
+
+   Subcommands (all take a JSON/YAML config whose ``datasets`` section declares the
+   adapters and schemas — see :mod:`omniloader.data.factory`):
+
+   * ``omniloader describe CONFIG`` — print the coverage/statistics report.
+   * ``omniloader validate CONFIG`` — check datasets against their specs (exit 1 on issues).
+   * ``omniloader compute-stats CONFIG -o STATS`` — compute and save normalization stats.
+   * ``omniloader class-weights-for-loss CONFIG --target KEY -o WEIGHTS`` — compute and
+     save per-class loss weights (and counts) for a categorical target.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.cli.build_parser
+   omniloader.cli.main
+
+
+Module Contents
+---------------
+
+.. py:function:: build_parser() -> argparse.ArgumentParser
+
+   Construct the argument parser for the ``omniloader`` CLI.
+
+
+.. py:function:: main(argv: collections.abc.Sequence[str] | None = None) -> int
+
+   Entry point for the ``omniloader`` console script.
+
+   :param argv: Optional argument list (defaults to ``sys.argv``).
+
+   :returns: The process exit code.
+
+

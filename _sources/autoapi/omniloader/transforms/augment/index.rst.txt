@@ -1,0 +1,157 @@
+omniloader.transforms.augment
+=============================
+
+.. py:module:: omniloader.transforms.augment
+
+.. autoapi-nested-parse::
+
+   Augmentation transforms: feature corruption, dropout and span masking.
+
+   These transforms are ``train_only`` — they self-skip during evaluation. Each one
+   respects the validity mask and is fully reproducible from an optional
+   :class:`torch.Generator`.
+
+   Literature techniques covered: Gaussian noise injection (feature corruption),
+   whole-feature ("stream"/modality) dropout, and contiguous span masking over
+   sequences (SpecAugment-style temporal masking).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.transforms.augment.GaussianNoise
+   omniloader.transforms.augment.FeatureDropout
+   omniloader.transforms.augment.SpanMasking
+   omniloader.transforms.augment.TimeWarp
+   omniloader.transforms.augment.FeatureMasking
+
+
+Module Contents
+---------------
+
+.. py:class:: GaussianNoise(keys: collections.abc.Sequence[str] | None = None, std: float = 0.1, p: float = 0.5, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Add zero-mean Gaussian noise to feature values (feature corruption).
+
+   :param keys: Feature keys to corrupt. When ``None``, every feature in the
+                schema is eligible (requires ``schema``).
+   :param std: Standard deviation of the additive noise.
+   :param p: Per-sample probability of applying noise to each key.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Add noise to each eligible key with probability ``p``.
+
+
+
+.. py:class:: FeatureDropout(keys: collections.abc.Sequence[str] | None = None, p: float = 0.2, keep_at_least_one: bool = True, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Drop entire features ("stream"/modality dropout).
+
+   With probability ``p`` a feature's value is zeroed and its mask set to all
+   ``False``, so a model treats it as absent. This generalises modality dropout
+   to any set of feature streams. Optionally guarantees at least one eligible
+   feature survives.
+
+   :param keys: Feature keys eligible for dropout. When ``None``, every feature in
+                the schema is eligible (requires ``schema``).
+   :param p: Per-sample probability of dropping each eligible feature.
+   :param keep_at_least_one: When ``True``, never drop the last surviving feature.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Zero and invalidate each eligible feature with probability ``p``.
+
+
+
+.. py:class:: SpanMasking(keys: collections.abc.Sequence[str] | None = None, num_spans: int = 1, span_len: int = 5, p: float = 0.5, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Zero contiguous spans of sequence features (SpecAugment-style masking).
+
+   For each configured sequence feature, up to ``num_spans`` contiguous spans of
+   length ``span_len`` are zeroed within the valid region. The validity mask is
+   left intact — the positions still exist for the model and for targets; only
+   their input content is corrupted, encouraging temporal robustness.
+
+   :param keys: Sequence-feature keys to mask. When ``None``, every sequence
+                feature in the schema is eligible (requires ``schema``).
+   :param num_spans: Number of spans to mask per key.
+   :param span_len: Length of each span along the sequence axis.
+   :param p: Per-sample probability of masking each eligible key.
+   :param schema: Schema used to resolve sequence ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Zero up to ``num_spans`` spans per eligible sequence feature.
+
+
+
+.. py:class:: TimeWarp(min_rate: float = 0.8, max_rate: float = 1.25, keys: collections.abc.Sequence[str] | None = None, p: float = 0.5, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Randomly stretch/squeeze the sequence in time (speed perturbation).
+
+   A single warp rate ``r`` in ``[min_rate, max_rate]`` is shared across the
+   targeted keys (so aligned features stay in sync): each sequence is resampled
+   to ``round(T * r)`` steps via linear interpolation and resized back to ``T``.
+   Only floating-point sequence **features** are warped by default (interpolating
+   integer class labels would be meaningless).
+
+   :param min_rate: Minimum warp rate (``< 1`` squeezes, ``> 1`` stretches).
+   :param max_rate: Maximum warp rate.
+   :param keys: Sequence keys to warp with a shared rate. When ``None``, all
+                floating-point sequence feature keys in the schema are used.
+   :param p: Per-sample probability of warping.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Resample each targeted key by a single shared random rate.
+
+
+
+.. py:class:: FeatureMasking(num_masks: int = 1, max_width: int = 4, keys: collections.abc.Sequence[str] | None = None, p: float = 0.5, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`omniloader.transforms.base.Transform`
+
+
+   Zero contiguous bands of feature dimensions (channel/frequency masking).
+
+   For each targeted key with a feature axis, ``num_masks`` bands of width up to
+   ``max_width`` are zeroed across all time steps — the feature-axis analogue of
+   :class:`SpanMasking`.
+
+   :param num_masks: Number of feature-dimension bands to zero per key.
+   :param max_width: Maximum band width along the feature axis.
+   :param keys: Feature keys to mask. When ``None``, every feature in the schema is
+                used (requires ``schema``).
+   :param p: Per-sample probability of masking each eligible key.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+
+
+   .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample
+
+      Zero up to ``num_masks`` feature bands per eligible key.
+
+
+

@@ -1,0 +1,77 @@
+omniloader.data.splits
+======================
+
+.. py:module:: omniloader.data.splits
+
+.. autoapi-nested-parse::
+
+   Reproducible train/val/test index splitting.
+
+   :func:`split_indices` partitions ``range(n)`` into named splits by ratio, with an
+   optional stratification label so each split preserves the class proportions.
+   :func:`save_split_info` / :func:`load_split_info` persist the result (plus the
+   seed and ratios) so the exact split can be reused across runs.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.data.splits.DEFAULT_NAMES
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.data.splits.split_indices
+   omniloader.data.splits.save_split_info
+   omniloader.data.splits.load_split_info
+
+
+Module Contents
+---------------
+
+.. py:data:: DEFAULT_NAMES
+   :value: ('train', 'valid', 'test')
+
+
+.. py:function:: split_indices(n: int, ratios: collections.abc.Sequence[float] = (0.8, 0.1, 0.1), seed: int = 0, stratify: collections.abc.Sequence[int] | None = None, names: collections.abc.Sequence[str] = DEFAULT_NAMES) -> dict[str, list[int]]
+
+   Partition ``range(n)`` into named, reproducible splits.
+
+   :param n: Number of samples to split.
+   :param ratios: Relative sizes per split (need not sum to one).
+   :param seed: Seed for the shuffle.
+   :param stratify: Optional per-index class labels of length ``n``; when given,
+                    each class is split by ``ratios`` so proportions are preserved.
+   :param names: Split names, aligned with ``ratios``.
+
+   :returns: Mapping of split name to a sorted list of indices; the splits are
+             disjoint and cover ``range(n)``.
+
+   :raises ValueError: If ``ratios``/``names`` mismatch or ``stratify`` has the
+       wrong length.
+
+
+.. py:function:: save_split_info(splits: dict[str, list[int]], path: str | pathlib.Path, meta: dict[str, Any] | None = None) -> None
+
+   Save splits (and optional metadata like seed/ratios) to JSON.
+
+   :param splits: The split mapping from :func:`split_indices`.
+   :param path: Destination ``.json`` file.
+   :param meta: Optional extra fields (e.g. ``{"seed": 0, "ratios": [...]}``).
+
+
+.. py:function:: load_split_info(path: str | pathlib.Path) -> dict[str, list[int]]
+
+   Load the ``splits`` mapping saved by :func:`save_split_info`.
+
+   :param path: Path to a JSON file written by :func:`save_split_info`.
+
+   :returns: The split-name to index-list mapping.
+
+

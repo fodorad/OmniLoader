@@ -1,0 +1,70 @@
+omniloader.sampling.sampler
+===========================
+
+.. py:module:: omniloader.sampling.sampler
+
+.. autoapi-nested-parse::
+
+   A ``Sampler`` that turns a mixing strategy into a per-epoch index stream.
+
+   :class:`OmniSampler` is the bridge between a
+   :class:`~omniloader.sampling.strategies.MixingStrategy` and PyTorch's ``DataLoader``.
+   Each epoch it asks the strategy for the global indices to visit; call
+   :meth:`OmniSampler.set_epoch` before every epoch to advance the reproducible draw.
+
+   It is **distributed-aware**: when ``num_replicas``/``rank`` are given (or inferred
+   from an initialized ``torch.distributed`` process group) it shards the epoch's
+   indices across replicas so each rank sees a disjoint slice, mirroring
+   ``torch.utils.data.DistributedSampler``.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.sampling.sampler.OmniSampler
+
+
+Module Contents
+---------------
+
+.. py:class:: OmniSampler(strategy: omniloader.sampling.strategies.MixingStrategy, epoch: int = 0, num_replicas: int | None = None, rank: int | None = None, drop_last: bool = False)
+
+   Bases: :py:obj:`torch.utils.data.Sampler`\ [\ :py:obj:`int`\ ]
+
+
+   Yield global indices for one epoch according to a mixing strategy.
+
+   :param strategy: The mixing strategy that computes the epoch's index list.
+   :param epoch: Initial epoch number.
+   :param num_replicas: Number of distributed replicas. ``None`` infers from
+                        ``torch.distributed`` (or ``1`` when not distributed).
+   :param rank: This process's replica index. ``None`` infers from
+                ``torch.distributed`` (or ``0``).
+   :param drop_last: When sharding, drop the tail so every rank gets exactly the
+                     same number of samples. When ``False`` (default), the index list is
+                     padded by wrapping so no sample is skipped.
+
+
+   .. py:method:: set_epoch(epoch: int) -> None
+
+      Set the epoch used to seed the next iteration.
+
+      :param epoch: The upcoming epoch number.
+
+
+
+   .. py:method:: __iter__() -> collections.abc.Iterator[int]
+
+      Iterate this rank's global indices for the current epoch.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Number of indices this rank produces per epoch.
+
+
+

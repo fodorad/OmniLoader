@@ -1,0 +1,251 @@
+omniloader.config
+=================
+
+.. py:module:: omniloader.config
+
+.. autoapi-nested-parse::
+
+   Configuration and reproducibility helpers.
+
+   :class:`OmniConfig` bundles the knobs a training run needs — seed, batch size,
+   worker count, the mixing strategy and the normalization/augmentation pipeline —
+   and loads from a dict, a JSON file or a YAML file so experiments stay
+   declarative. :func:`seed_everything` seeds Python, NumPy and PyTorch in one call.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.config.STRATEGIES
+   omniloader.config.COLLATES
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.config.OmniConfig
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.config.seed_everything
+
+
+Module Contents
+---------------
+
+.. py:data:: STRATEGIES
+   :type:  dict[str, type[omniloader.sampling.strategies.MixingStrategy]]
+
+.. py:data:: COLLATES
+   :type:  tuple[str, Ellipsis]
+   :value: ('unified', 'dynamic', 'mixup')
+
+
+.. py:function:: seed_everything(seed: int) -> int
+
+   Seed Python, NumPy and PyTorch RNGs for reproducibility.
+
+   :param seed: The seed value.
+
+   :returns: The seed, for convenience.
+
+
+.. py:class:: OmniConfig
+
+   Declarative configuration for an OmniLoader training run.
+
+   :param seed: Global RNG seed.
+   :param batch_size: Batch size for the ``DataLoader``.
+   :param num_workers: Number of worker processes for the ``DataLoader``.
+   :param pad_features: Whether the unifier pads/crops sequence values.
+   :param strategy: Name of the mixing strategy (a key of :data:`STRATEGIES`).
+   :param strategy_kwargs: Extra keyword arguments forwarded to the strategy
+                           (e.g. ``temperature``, ``weights``, ``samples_per_dataset``).
+   :param transforms: Ordered list of transform config dicts (each with a ``name``
+                      key) applied during training. Stats-based normalizers may reference a
+                      saved stats file via ``stats_path`` (or ``union_stats_path``) instead of
+                      inlining ``stats``. See :func:`~omniloader.transforms.build_transform`.
+   :param eval_transforms: Transforms applied during evaluation. When ``None``,
+                           only the non-augmenting (train-agnostic) transforms in
+                           :attr:`transforms`, such as ``normalize``, take effect.
+   :param datasets: Declarative dataset entries (adapter + args + schema) built by
+                    :meth:`build_datasets`. See :mod:`omniloader.data.factory`.
+   :param subsample: Optional per-dataset subsampling entries (one per dataset, or
+                     ``None`` to skip a dataset), each a dict for :class:`SubsampleConfig`.
+                     Built by :meth:`build_subsample` and fed to :meth:`build_strategy`.
+   :param collate: Collate function name — one of :data:`COLLATES` (``"unified"``,
+                   ``"dynamic"`` or ``"mixup"``). See :meth:`build_collate`. ``"dynamic"``
+                   only reduces padding with :attr:`pad_features` set to ``False`` (under a
+                   fixed ``time_dim`` it behaves like ``"unified"``).
+   :param collate_kwargs: Extra keyword arguments for the collator. For ``"dynamic"``
+                          an optional ``keys`` list; for ``"mixup"`` a ``base`` collate name plus
+                          ``alpha``/``mode``/``p``.
+   :param bucketing: Optional length-bucketing entry with a ``key`` (sequence name to
+                     bucket by) and optional ``batch_size``/``bucket_multiplier``/
+                     ``drop_last``/``shuffle``. When set, :meth:`build_dataloader` batches
+                     with :class:`~omniloader.sampling.bucketing.LengthBucketBatchSampler`.
+                     Only meaningful with ``pad_features=False`` (a no-op under a fixed
+                     ``time_dim``).
+   :param num_replicas: Distributed replica count for the sampler. ``None`` infers
+                        it from ``torch.distributed``.
+   :param rank: This process's distributed rank. ``None`` infers it.
+   :param drop_last: Drop the uneven tail when sharding across replicas.
+   :param pin_memory: Copy tensors into pinned memory before returning them (faster
+                      host-to-GPU transfer). Forwarded to the ``DataLoader``.
+   :param persistent_workers: Keep worker processes alive between epochs. Only takes
+                              effect when :attr:`num_workers` > 0.
+   :param prefetch_factor: Batches prefetched per worker. Only applied when
+                           :attr:`num_workers` > 0; ``None`` uses the PyTorch default.
+
+
+   .. py:method:: from_dict(data: dict[str, Any]) -> OmniConfig
+      :classmethod:
+
+
+      Build a config from a plain dict, ignoring unknown keys.
+
+      :param data: Mapping of field names to values.
+
+      :returns: The populated config.
+
+
+
+   .. py:method:: from_yaml(path: str | pathlib.Path) -> OmniConfig
+      :classmethod:
+
+
+      Load a config from a YAML file.
+
+
+
+   .. py:method:: from_json(path: str | pathlib.Path) -> OmniConfig
+      :classmethod:
+
+
+      Load a config from a JSON file.
+
+
+
+   .. py:method:: from_file(path: str | pathlib.Path) -> OmniConfig
+      :classmethod:
+
+
+      Load a config from a ``.json``, ``.yaml`` or ``.yml`` file by extension.
+
+      :param path: Path to a config file.
+
+      :returns: The populated config.
+
+      :raises ValueError: If the file extension is not recognised.
+
+
+
+   .. py:method:: to_dict() -> dict[str, Any]
+
+      Return the config as a plain dict.
+
+
+
+   .. py:method:: build_strategy(sizes: collections.abc.Sequence[int], subsample: collections.abc.Sequence[omniloader.sampling.strategies.SubsampleConfig | None] | None = None) -> omniloader.sampling.strategies.MixingStrategy
+
+      Instantiate the configured mixing strategy for the given sizes.
+
+      :param sizes: Per-dataset sample counts.
+      :param subsample: Optional per-dataset subsample configs.
+
+      :returns: The configured :class:`~omniloader.sampling.strategies.MixingStrategy`.
+
+      :raises ValueError: If :attr:`strategy` is not a known strategy name.
+
+
+
+   .. py:method:: build_transform(schema: omniloader.schema.spec.UnifiedSchema, training: bool = True) -> omniloader.transforms.Compose | None
+
+      Build the transform pipeline for a split.
+
+      :param schema: The unified schema, injected into schema-aware transforms.
+      :param training: When ``True``, uses :attr:`transforms`; otherwise uses
+                       :attr:`eval_transforms` if set, else :attr:`transforms` (whose
+                       augmentations self-skip in eval mode).
+
+      :returns: A :class:`~omniloader.transforms.Compose`, or ``None`` if empty.
+
+
+
+   .. py:method:: build_datasets() -> tuple[list[omniloader.loader.SizedDataset], list[omniloader.schema.spec.DatasetSchema]]
+
+      Construct the datasets/schemas declared in :attr:`datasets`.
+
+      :returns: A ``(datasets, schemas)`` tuple. See
+                :func:`omniloader.data.factory.build_datasets`.
+
+
+
+   .. py:method:: build_subsample() -> list[omniloader.sampling.strategies.SubsampleConfig | None] | None
+
+      Build the per-dataset :class:`SubsampleConfig` list from :attr:`subsample`.
+
+      :returns: One :class:`SubsampleConfig` (or ``None``) per dataset, or ``None`` when
+                :attr:`subsample` is unset.
+
+
+
+   .. py:method:: build_collate(schema: omniloader.schema.spec.UnifiedSchema, training: bool = True) -> collections.abc.Callable[[collections.abc.Sequence[dict[str, Any]]], dict[str, Any]]
+
+      Build the collate function named by :attr:`collate`.
+
+      :param schema: The unified schema, injected into schema-aware collators.
+      :param training: When ``False``, the batch-level ``"mixup"`` augmentation is
+                       disabled and its ``base`` collator is used instead.
+
+      :returns: A callable turning a list of samples into a batched dict.
+
+      :raises ValueError: If :attr:`collate` (or a ``mixup`` ``base``) is unknown.
+
+
+
+   .. py:method:: build_loader(datasets: collections.abc.Sequence[omniloader.loader.SizedDataset] | None = None, schemas: collections.abc.Sequence[omniloader.schema.spec.DatasetSchema] | None = None, training: bool = True) -> omniloader.loader.OmniLoader
+
+      Build a fully configured :class:`~omniloader.loader.OmniLoader`.
+
+      :param datasets: Source datasets. When ``None``, they are built from
+                       :attr:`datasets` via :meth:`build_datasets`.
+      :param schemas: Per-dataset schemas. Required when ``datasets`` is given;
+                      ignored (rebuilt) when ``datasets`` is ``None``.
+      :param training: Whether augmentations are active (``False`` for val/test).
+
+      :returns: The loader with its transform pipeline wired in.
+
+      :raises ValueError: If ``datasets`` is given without ``schemas``.
+
+
+
+   .. py:method:: build_dataloader(datasets: collections.abc.Sequence[omniloader.loader.SizedDataset] | None = None, schemas: collections.abc.Sequence[omniloader.schema.spec.DatasetSchema] | None = None, training: bool = True, epoch: int = 0) -> torch.utils.data.DataLoader
+
+      Assemble a ready-to-iterate ``DataLoader`` entirely from this config.
+
+      Wires together the loader, mixing strategy, distributed sampler, collate
+      function and (optionally) length bucketing. Training loaders draw indices
+      through the configured :class:`~omniloader.sampling.strategies.MixingStrategy`;
+      evaluation loaders (``training=False``) iterate sequentially for a stable,
+      full-coverage pass.
+
+      :param datasets: Source datasets, or ``None`` to build them from
+                       :attr:`datasets`.
+      :param schemas: Per-dataset schemas (required with ``datasets``).
+      :param training: Whether this is the training split.
+      :param epoch: Initial epoch for the sampler and per-sample augmentation.
+
+      :returns: A configured :class:`torch.utils.data.DataLoader`.
+
+
+

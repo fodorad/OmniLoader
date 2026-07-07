@@ -1,0 +1,49 @@
+omniloader.templates
+====================
+
+.. py:module:: omniloader.templates
+
+.. autoapi-nested-parse::
+
+   Packaged configuration templates shipped with OmniLoader.
+
+   The annotated ``config_template.yaml`` lists every option
+   :class:`~omniloader.config.OmniConfig` understands, with defaults and inline
+   guidance. Locate it programmatically with :func:`config_template_path` (e.g. to
+   copy it as a starting point for a new experiment).
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   omniloader.templates.CONFIG_TEMPLATE
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.templates.config_template_path
+
+
+Package Contents
+----------------
+
+.. py:data:: CONFIG_TEMPLATE
+   :value: 'config_template.yaml'
+
+
+.. py:function:: config_template_path() -> pathlib.Path
+
+   Return the filesystem path to the annotated ``config_template.yaml``.
+
+   The template ships as package data, so this resolves it wherever OmniLoader
+   is installed (source tree or wheel).
+
+   :returns: The path to the annotated config template.
+
+

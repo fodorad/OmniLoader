@@ -1,0 +1,90 @@
+omniloader.collate
+==================
+
+.. py:module:: omniloader.collate
+
+.. autoapi-nested-parse::
+
+   Collate functions for batching unified samples.
+
+   Two collators are provided:
+
+   * :func:`unified_collate` — the default: every sample already shares the same
+     tensor shapes (the unified schema, with sequences padded to a fixed ``time_dim``),
+     so it simply stacks tensors and gathers string metadata into lists.
+   * :class:`DynamicCollator` — pads each sequence key only to the batch's longest
+     sample instead of a fixed ``time_dim``. Use it with
+     ``OmniLoader(pad_features=False)`` to avoid wasting memory/compute on padding
+     when sequence lengths vary a lot across the batch.
+
+   Masks vs. cost: a ``<name>_mask`` guarantees *correctness* (padded steps never
+   corrupt the model output or the loss), but a padded step still costs compute and
+   memory (self-attention is ``O(T²)``). Dynamic padding targets that cost — so it is
+   only useful in the native-length regime. Under the default fixed ``time_dim``
+   (``pad_features=True``) every batch is already one length and :class:`DynamicCollator`
+   is a no-op.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.collate.DynamicCollator
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.collate.unified_collate
+
+
+Module Contents
+---------------
+
+.. py:function:: unified_collate(batch: collections.abc.Sequence[dict[str, Any]]) -> dict[str, Any]
+
+   Collate a list of unified samples into a batched dict.
+
+   :param batch: Samples produced by :class:`~omniloader.loader.OmniLoader`.
+
+   :returns: A dict where each tensor key holds a stacked tensor of shape
+             ``(B, ...)`` and each non-tensor key holds a list of length ``B``.
+
+   :raises ValueError: If the batch is empty.
+
+
+.. py:class:: DynamicCollator(schema: omniloader.schema.spec.UnifiedSchema, keys: collections.abc.Sequence[str] | None = None)
+
+   Collate with per-batch dynamic padding of sequence keys.
+
+   Sequence values (those whose spec sets ``time_dim``) are padded to the
+   longest sample in the batch — ``(B, L_batch, F)`` instead of a fixed
+   ``(B, time_dim, F)`` — and their ``<name>_mask`` is rebuilt accordingly.
+   Vectors, scalars and metadata are batched exactly as
+   :func:`unified_collate` does. Pair with ``OmniLoader(pad_features=False)`` so
+   samples reach the collator at their native length; under the default fixed
+   ``time_dim`` every sample already shares one length, so this collator has
+   nothing to shrink and behaves like :func:`unified_collate`.
+
+   :param schema: The unified schema, used to identify sequence keys and their
+                  placeholder fill values.
+   :param keys: Optional subset of sequence keys to pad dynamically. When ``None``,
+                every sequence key in the schema is padded dynamically.
+
+
+   .. py:method:: __call__(batch: collections.abc.Sequence[dict[str, Any]]) -> dict[str, Any]
+
+      Collate ``batch``, dynamically padding the configured sequence keys.
+
+      :param batch: Samples to collate.
+
+      :returns: The batched dict.
+
+      :raises ValueError: If the batch is empty.
+
+
+

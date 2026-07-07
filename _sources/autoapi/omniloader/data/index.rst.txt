@@ -1,0 +1,18 @@
+omniloader.data
+===============
+
+.. py:module:: omniloader.data
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/omniloader/data/datasets/index
+   /autoapi/omniloader/data/factory/index
+   /autoapi/omniloader/data/npy/index
+   /autoapi/omniloader/data/splits/index
+
+

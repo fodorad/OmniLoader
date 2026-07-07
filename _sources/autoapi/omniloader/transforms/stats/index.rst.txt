@@ -1,0 +1,117 @@
+omniloader.transforms.stats
+===========================
+
+.. py:module:: omniloader.transforms.stats
+
+.. autoapi-nested-parse::
+
+   Compute and persist feature normalization statistics over a dataset.
+
+   :func:`compute_feature_stats` estimates per-feature ``(mean, std)`` (streaming),
+   while :func:`compute_stats` returns the richer set (mean/std/min/max/median/iqr)
+   needed by every normalizer variant. :func:`compute_dataset_stats` computes that
+   richer set **separately per source dataset** (grouped by the ``dataset`` metadata
+   key) for dataset-conditional normalization. :func:`save_stats`/:func:`load_stats`
+   round-trip either the flat (``{key: {...}}``) or the nested
+   (``{dataset: {key: {...}}}``) form through JSON. All are modality-agnostic: they
+   accumulate over the trailing feature axis of both vectors and sequences, counting
+   only valid (unmasked) positions.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.transforms.stats.compute_feature_stats
+   omniloader.transforms.stats.compute_stats
+   omniloader.transforms.stats.compute_dataset_stats
+   omniloader.transforms.stats.save_stats
+   omniloader.transforms.stats.load_stats
+
+
+Module Contents
+---------------
+
+.. py:function:: compute_feature_stats(samples: collections.abc.Iterable[dict[str, torch.Tensor]], keys: collections.abc.Sequence[str], eps: float = 1e-06) -> dict[str, tuple[torch.Tensor, torch.Tensor]]
+
+   Estimate per-feature ``(mean, std)`` for each key over valid positions.
+
+   :param samples: An iterable of unified sample dicts (e.g. an
+                   :class:`~omniloader.loader.OmniLoader`). Each yields values and
+                   their ``<name>_mask`` companions.
+   :param keys: The feature keys to compute statistics for.
+   :param eps: Lower bound applied to the standard deviation to avoid zeros.
+
+   :returns: Mapping of key to ``(mean, std)`` tensors of shape ``(F,)`` for
+             features with a trailing feature axis, or ``()`` for scalar sequences.
+
+   :raises ValueError: If a key never has any valid position across the samples.
+
+
+.. py:function:: compute_stats(samples: collections.abc.Iterable[dict[str, torch.Tensor]], keys: collections.abc.Sequence[str], eps: float = 1e-06) -> dict[str, dict[str, torch.Tensor]]
+
+   Compute the full statistic set per key, feeding every normalizer variant.
+
+   Unlike :func:`compute_feature_stats`, this collects all valid positions (to
+   compute median/IQR), so it uses more memory; run it once and persist with
+   :func:`save_stats`.
+
+   :param samples: An iterable of unified sample dicts.
+   :param keys: The feature keys to compute statistics for.
+   :param eps: Lower bound for ``std`` and ``iqr`` to avoid zeros.
+
+   :returns: Mapping of key to ``{"mean", "std", "min", "max", "median", "iqr"}``
+             tensors of shape ``(F,)`` (or ``()`` for scalar sequences).
+
+   :raises ValueError: If a key never has any valid position across the samples.
+
+
+.. py:function:: compute_dataset_stats(samples: collections.abc.Iterable[dict[str, Any]], keys: collections.abc.Sequence[str], dataset_key: str = 'dataset', eps: float = 1e-06) -> dict[str, dict[str, dict[str, torch.Tensor]]]
+
+   Compute the full statistic set per key, **grouped by source dataset**.
+
+   Feeds :class:`~omniloader.transforms.normalize.PerDatasetNormalize`: each source
+   dataset (identified by the ``dataset`` metadata key every unified sample carries)
+   gets its own statistics, so datasets can be standardized by their own mean/std
+   rather than a pooled estimate. As with :func:`compute_stats`, only valid
+   (unmasked) positions contribute. Keys a dataset never provides are simply absent
+   from that dataset's stats.
+
+   :param samples: An iterable of unified sample dicts (e.g. an
+                   :class:`~omniloader.loader.OmniLoader`). Each must carry ``dataset_key``.
+   :param keys: The feature keys to compute statistics for.
+   :param dataset_key: Metadata key holding each sample's source-dataset name.
+   :param eps: Lower bound for ``std`` and ``iqr`` to avoid zeros.
+
+   :returns: Mapping of dataset name to a stats mapping (``{key: {"mean", "std", ...}}``),
+             matching :func:`compute_stats`'s per-key shape.
+
+   :raises ValueError: If a sample lacks ``dataset_key`` (required to group by dataset).
+
+
+.. py:function:: save_stats(stats: collections.abc.Mapping[str, Any], path: str | pathlib.Path) -> None
+
+   Save a stats mapping to JSON (tensors are stored as nested lists).
+
+   Handles both the flat form from :func:`compute_stats` (``{key: {field: tensor}}``)
+   and the nested per-dataset form from :func:`compute_dataset_stats`
+   (``{dataset: {key: {field: tensor}}}``).
+
+   :param stats: A stats mapping.
+   :param path: Destination ``.json`` file.
+
+
+.. py:function:: load_stats(path: str | pathlib.Path) -> dict[str, Any]
+
+   Load a stats mapping saved by :func:`save_stats`, restoring float tensors.
+
+   Restores either the flat or the nested per-dataset form (mirroring
+   :func:`save_stats`).
+
+   :param path: Path to a JSON file written by :func:`save_stats`.
+
+   :returns: The stats mapping with leaf lists restored to float tensors.
+
+

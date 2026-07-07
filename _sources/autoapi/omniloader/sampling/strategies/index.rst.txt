@@ -1,0 +1,234 @@
+omniloader.sampling.strategies
+==============================
+
+.. py:module:: omniloader.sampling.strategies
+
+.. autoapi-nested-parse::
+
+   Dataset-mixing strategies that decide the per-epoch sampling scheme.
+
+   Each strategy answers one question: *given several datasets of possibly very
+   different sizes, how many samples from each should the network see per epoch, and
+   in what order?* Strategies return a flat list of **global** indices (into the
+   concatenated OmniLoader dataset) via :meth:`MixingStrategy.epoch_indices`, so a
+   plain :class:`~omniloader.sampling.sampler.OmniSampler` can drive an ordinary
+   ``DataLoader``.
+
+   Available strategies:
+
+   * :class:`ProportionalStrategy` — sample in proportion to true dataset sizes.
+   * :class:`TemperatureStrategy` — re-weight by ``size ** (1 / temperature)``
+     (``temperature=2`` recovers square-root scaling).
+   * :class:`FixedWeightStrategy` — explicit per-dataset weights, or uniform.
+   * :class:`RoundRobinStrategy` — a fixed effective size per dataset, interleaved.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.sampling.strategies.SubsampleConfig
+   omniloader.sampling.strategies.MixingStrategy
+   omniloader.sampling.strategies.ProportionalStrategy
+   omniloader.sampling.strategies.TemperatureStrategy
+   omniloader.sampling.strategies.FixedWeightStrategy
+   omniloader.sampling.strategies.RoundRobinStrategy
+   omniloader.sampling.strategies.AnnealedTemperatureStrategy
+
+
+Module Contents
+---------------
+
+.. py:class:: SubsampleConfig
+
+   Per-dataset sampling options.
+
+   :param replacement: Whether indices may repeat within an epoch.
+   :param policy: Exhaustion policy for without-replacement draws.
+   :param effective_size: Override for how many samples this dataset contributes
+                          per epoch. When ``None``, the strategy decides.
+   :param sample_weights: Optional per-sample weights (length = dataset size) for
+                          skewed within-dataset sampling, e.g. class balancing.
+
+
+.. py:class:: MixingStrategy(sizes: collections.abc.Sequence[int], seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Base class turning per-dataset sizes into per-epoch global index lists.
+
+   :param sizes: Number of samples in each dataset, in OmniLoader order.
+   :param seed: Base seed for reproducible draws and shuffles.
+   :param subsample: Optional per-dataset :class:`SubsampleConfig`. Missing
+                     entries fall back to a default config.
+
+   :raises ValueError: If ``sizes`` is empty or contains a non-positive entry.
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+      :abstractmethod:
+
+
+      Number of samples each dataset contributes in ``epoch``.
+
+      :param epoch: The epoch number (used only by epoch-dependent strategies
+                    such as :class:`AnnealedTemperatureStrategy`).
+
+      :returns: A list with one non-negative count per dataset.
+
+
+
+   .. py:method:: epoch_indices(epoch: int) -> list[int]
+
+      Build the shuffled list of global indices to visit this epoch.
+
+      :param epoch: The epoch number, used to seed draws and the final shuffle.
+
+      :returns: A flat list of global indices into the concatenated dataset.
+
+
+
+   .. py:method:: __len__() -> int
+
+      Total number of samples produced per epoch (evaluated at epoch 0).
+
+
+
+.. py:class:: ProportionalStrategy(sizes: collections.abc.Sequence[int], seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`MixingStrategy`
+
+
+   Sample each dataset in proportion to its true size (full concatenation).
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+
+      Return each dataset's full size.
+
+
+
+.. py:class:: TemperatureStrategy(sizes: collections.abc.Sequence[int], temperature: float = 2.0, seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`MixingStrategy`
+
+
+   Re-weight datasets by ``size ** (1 / temperature)``.
+
+   ``temperature=1`` reduces to proportional sampling; ``temperature=2`` is
+   square-root scaling; larger values push the mixture toward uniform. The
+   total epoch size is preserved (equal to the sum of dataset sizes) unless
+   per-dataset ``effective_size`` overrides are set.
+
+   :param sizes: Per-dataset sizes.
+   :param temperature: Sampling temperature ``>= 1``.
+   :param seed: Base seed.
+   :param subsample: Optional per-dataset configs.
+
+   :raises ValueError: If ``temperature`` is less than 1.
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+
+      Return per-dataset counts weighted by ``size ** (1 / temperature)``.
+
+
+
+.. py:class:: FixedWeightStrategy(sizes: collections.abc.Sequence[int], weights: collections.abc.Sequence[float] | None = None, epoch_size: int | None = None, seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`MixingStrategy`
+
+
+   Sample datasets according to explicit weights (or uniformly).
+
+   :param sizes: Per-dataset sizes.
+   :param weights: Relative weight per dataset. When ``None``, all datasets are
+                   weighted equally (uniform mixing). Need not sum to one.
+   :param epoch_size: Total samples per epoch. Defaults to the sum of sizes.
+   :param seed: Base seed.
+   :param subsample: Optional per-dataset configs.
+
+   :raises ValueError: If ``weights`` has the wrong length or is not positive.
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+
+      Return per-dataset counts apportioned by the fixed weights.
+
+
+
+.. py:class:: RoundRobinStrategy(sizes: collections.abc.Sequence[int], samples_per_dataset: int | None = None, seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`MixingStrategy`
+
+
+   Draw a fixed number of samples per dataset and interleave them.
+
+   Unlike the weighted strategies, this one takes an explicit effective size
+   per dataset (default: the smallest dataset's size, so every dataset
+   contributes equally) and interleaves the datasets round-robin rather than
+   globally shuffling, which keeps batches diverse across datasets.
+
+   :param sizes: Per-dataset sizes.
+   :param samples_per_dataset: Number of samples to draw from each dataset each
+                               epoch. When ``None``, uses the size of the smallest dataset.
+   :param seed: Base seed.
+   :param subsample: Optional per-dataset configs (``effective_size`` overrides
+                     ``samples_per_dataset`` for that dataset).
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+
+      Return an equal count per dataset (smallest size unless overridden).
+
+
+
+   .. py:method:: epoch_indices(epoch: int) -> list[int]
+
+      Interleave datasets round-robin instead of globally shuffling.
+
+      :param epoch: The epoch number.
+
+      :returns: Global indices ordered so consecutive samples come from different
+                datasets where possible.
+
+
+
+.. py:class:: AnnealedTemperatureStrategy(sizes: collections.abc.Sequence[int], start_temperature: float = 5.0, end_temperature: float = 1.0, num_epochs: int = 10, seed: int = 0, subsample: collections.abc.Sequence[SubsampleConfig | None] | None = None)
+
+   Bases: :py:obj:`MixingStrategy`
+
+
+   Temperature sampling whose temperature anneals across epochs.
+
+   Multilingual/multi-task training often starts near-uniform (high temperature,
+   up-weighting small datasets) and anneals toward proportional (temperature 1)
+   so later epochs match the true data distribution. The temperature is linearly
+   interpolated from ``start_temperature`` at epoch 0 to ``end_temperature`` at
+   epoch ``num_epochs - 1`` (and held there afterwards).
+
+   :param sizes: Per-dataset sizes.
+   :param start_temperature: Temperature at epoch 0 (``>= 1``).
+   :param end_temperature: Temperature at the final epoch (``>= 1``).
+   :param num_epochs: Number of epochs over which to anneal.
+   :param seed: Base seed.
+   :param subsample: Optional per-dataset configs.
+
+   :raises ValueError: If a temperature is below 1 or ``num_epochs`` is not positive.
+
+
+   .. py:method:: temperature_at(epoch: int) -> float
+
+      Return the interpolated temperature for ``epoch``.
+
+
+
+   .. py:method:: target_counts(epoch: int) -> list[int]
+
+      Return counts using the epoch's annealed temperature.
+
+
+

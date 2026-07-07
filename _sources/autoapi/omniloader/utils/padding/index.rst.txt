@@ -1,0 +1,102 @@
+omniloader.utils.padding
+========================
+
+.. py:module:: omniloader.utils.padding
+
+.. autoapi-nested-parse::
+
+   Padding and cropping utilities for the time dimension.
+
+   Adapted from ``exordium.utils.padding`` so OmniLoader can bring variable-length
+   sequences to a fixed target length and produce the matching validity masks.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   omniloader.utils.padding.pad_or_crop_time_dim
+   omniloader.utils.padding.repeat_pad_time_dim
+   omniloader.utils.padding.fill_gaps_with_repeat
+
+
+Module Contents
+---------------
+
+.. py:function:: pad_or_crop_time_dim(tensor: torch.Tensor, target_size: int, pad_value: int | float = 0) -> tuple[torch.Tensor, torch.Tensor]
+
+   Adjust the time dimension (T) of a tensor to a given size and generate a mask.
+
+   Handles tensors of shape ``(T, F)`` or ``(T,)``.
+
+   :param tensor: Input tensor with shape ``(T, F)`` or ``(T,)``.
+   :param target_size: Desired size for the time dimension.
+   :param pad_value: Value to use for padding. Defaults to 0.
+
+   :returns: Tuple of ``(adjusted_tensor, mask)`` where ``mask`` is a bool tensor
+             of shape ``(target_size,)`` with ``True`` for original values and
+             ``False`` for padded positions.
+
+
+.. py:function:: repeat_pad_time_dim(tensor: torch.Tensor, target_size: int) -> torch.Tensor
+
+   Pad the time dimension by repeating the last time step.
+
+   If ``target_size <= T`` the tensor is returned unchanged (no cropping).
+
+   :param tensor: Input tensor of shape ``(T, ...)`` where ``T`` is the time
+                  dimension (e.g. ``(T, C, H, W)`` or ``(T, D)``).
+   :param target_size: Desired length of the time dimension.
+
+   :returns: Tensor of shape ``(target_size, ...)`` where steps beyond the
+             original length are copies of the last time step.
+
+   :raises ValueError: If the tensor has zero time steps.
+
+   Example::
+
+       >>> x = torch.tensor([[1, 2], [3, 4]])  # (2, 2)
+       >>> repeat_pad_time_dim(x, 5)
+       tensor([[1, 2], [3, 4], [3, 4], [3, 4], [3, 4]])
+
+
+
+.. py:function:: fill_gaps_with_repeat(tensor: torch.Tensor, valid_mask: torch.Tensor | None = None) -> torch.Tensor
+
+   Fill zero-valued time steps by repeating the nearest earlier valid step.
+
+   Given a tensor of shape ``(T, ...)`` where some time steps are entirely
+   zero (no data), this function fills each gap by copying the closest
+   preceding valid step. If the tensor starts with zeros before the first
+   valid step, those leading positions are back-filled from the first valid
+   step.
+
+   A time step is considered **valid** when any element is non-zero, unless
+   an explicit ``valid_mask`` is provided.
+
+   :param tensor: Input tensor of shape ``(T, ...)``.
+   :param valid_mask: Optional boolean tensor of shape ``(T,)``. ``True``
+                      marks valid (non-gap) time steps. When ``None``, validity is
+                      inferred as ``tensor.flatten(1).any(dim=1)``.
+
+   :returns: Tensor of the same shape with all gaps filled.
+
+   :raises ValueError: If the tensor contains no valid time steps at all.
+
+   Example::
+
+       >>> x = torch.zeros(6, 2)
+       >>> x[1] = torch.tensor([1.0, 2.0])
+       >>> x[4] = torch.tensor([3.0, 4.0])
+       >>> fill_gaps_with_repeat(x)
+       tensor([[1., 2.],   # back-filled from step 1
+               [1., 2.],   # valid
+               [1., 2.],   # forward-filled from step 1
+               [1., 2.],   # forward-filled from step 1
+               [3., 4.],   # valid
+               [3., 4.]])  # forward-filled from step 4
+
+
+

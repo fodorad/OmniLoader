@@ -1,0 +1,84 @@
+omniloader.integrations.lightning
+=================================
+
+.. py:module:: omniloader.integrations.lightning
+
+.. autoapi-nested-parse::
+
+   Optional PyTorch Lightning integration.
+
+   This module wires OmniLoaders and mixing strategies into a
+   ``LightningDataModule``. Lightning is an optional dependency: importing this
+   module without it installed raises a clear error, while the rest of OmniLoader
+   keeps working with plain ``torch.utils.data`` loaders. Install via the
+   ``omniloader[lightning]`` extra.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   omniloader.integrations.lightning.OmniDataModule
+
+
+Module Contents
+---------------
+
+.. py:class:: OmniDataModule(config: omniloader.config.OmniConfig, train: tuple[collections.abc.Sequence[omniloader.loader.SizedDataset], collections.abc.Sequence[omniloader.schema.spec.DatasetSchema]] | None = None, valid: tuple[collections.abc.Sequence[omniloader.loader.SizedDataset], collections.abc.Sequence[omniloader.schema.spec.DatasetSchema]] | None = None, test: tuple[collections.abc.Sequence[omniloader.loader.SizedDataset], collections.abc.Sequence[omniloader.schema.spec.DatasetSchema]] | None = None, schema: omniloader.schema.spec.UnifiedSchema | None = None)
+
+   Bases: :py:obj:`_LightningBase`
+
+
+   A ``LightningDataModule`` that mixes datasets per split via OmniLoader.
+
+   The train split is mixed with the configured strategy through an
+   :class:`~omniloader.sampling.sampler.OmniSampler`; validation and test splits are
+   iterated in order (proportional, no shuffling) for stable evaluation.
+
+   :param config: The run configuration (seed, batch size, strategy, ...).
+   :param train: ``(datasets, schemas)`` for the training split, or ``None``.
+   :param valid: ``(datasets, schemas)`` for the validation split, or ``None``.
+   :param test: ``(datasets, schemas)`` for the test split, or ``None``.
+   :param schema: Optional shared unified schema applied to every split. When
+                  ``None``, each split unions its own schemas.
+
+
+   .. py:method:: setup(stage: str | None = None) -> None
+
+      Instantiate the loaders and the training sampler.
+
+      :param stage: Lightning stage hint (unused; all splits are built lazily).
+
+
+
+   .. py:method:: set_epoch(epoch: int) -> None
+
+      Propagate the epoch to every loader and the training sampler.
+
+      Ensures both the mixing draw and per-sample augmentation advance each
+      epoch while staying reproducible.
+
+      :param epoch: The upcoming epoch number.
+
+
+
+   .. py:method:: train_dataloader() -> torch.utils.data.DataLoader | None
+
+      Return the training ``DataLoader`` (or ``None`` if no train split).
+
+
+
+   .. py:method:: val_dataloader() -> torch.utils.data.DataLoader | None
+
+      Return the validation ``DataLoader`` (or ``None``).
+
+
+
+   .. py:method:: test_dataloader() -> torch.utils.data.DataLoader | None
+
+      Return the test ``DataLoader`` (or ``None``).
+
+
+
