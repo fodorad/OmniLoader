@@ -75,7 +75,7 @@ from omniloader.utils.seeding import seed_worker
 try:
     __version__ = version("omniloader")
 except PackageNotFoundError:  # pragma: no cover - only during local, uninstalled use
-    __version__ = "0.0.0"
+    __version__ = "1.0.0"
 
 __all__ = [
     "AnnealedTemperatureStrategy",
