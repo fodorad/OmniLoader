@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0  # required for hatch-vcs git describe
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: |
+        # On Linux CI, use CPU-only PyTorch wheels to avoid CUDA runtime
+        # dependencies that are absent on the runner. PEP 440 ignores local
+        # version segments, so torch>=2.0 matches both the CPU and CUDA builds.
+        uv pip install --system --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[all,dev,docs]"
+
+    - name: Audit dependencies for vulnerabilities
+      run: uvx pip-audit
+      continue-on-error: true  # torch may have known CVEs; treat as warning
+
+    - name: Ruff Lint
+      run: ruff check .
+
+    - name: Ruff Format
+      run: ruff format --check .
+
+    - name: Type check (ty)
+      run: ty check omniloader
+
+    - name: Test & Coverage
+      run: |
+        coverage run -m unittest discover -s tests -v
+        coverage report
+        coverage html
+        coverage xml -o coverage.xml
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v7
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.xml
+        fail_ci_if_error: true
+
+    - name: Upload coverage HTML
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-report
+        path: coverage_html/
+      if: always()
+
+    - name: Build docs
+      run: sphinx-build -b html docs/ site/

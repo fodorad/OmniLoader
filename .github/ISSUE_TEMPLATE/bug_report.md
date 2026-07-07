@@ -1,0 +1,44 @@
+---
+name: Bug report
+about: Report something that is broken or not working as expected
+labels: bug
+assignees: fodorad
+---
+
+## Description
+
+A clear and concise description of the bug.
+
+## Steps to reproduce
+
+```python
+# Minimal reproducible example
+import torch
+from omniloader import DictTensorDataset, DatasetSchema, TensorSpec, OmniLoader
+
+# ...
+```
+
+## Expected behaviour
+
+What you expected to happen.
+
+## Actual behaviour
+
+What actually happened. Include the full traceback if applicable.
+
+```
+Traceback (most recent call last):
+  ...
+```
+
+## Environment
+
+- OmniLoader version: <!-- e.g. 1.0.0 — run `pip show omniloader` -->
+- PyTorch version: <!-- e.g. 2.11 -->
+- Python version: <!-- e.g. 3.12.3 -->
+- OS: <!-- e.g. Ubuntu 22.04 / macOS 15 / Windows 11 -->
+
+## Additional context
+
+Any other information that might be helpful (dataset shapes, schema, etc.).

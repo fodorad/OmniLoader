@@ -1,0 +1,15 @@
+{
+  "seed": 7,
+  "batch_size": 16,
+  "strategy": "annealed_temperature",
+  "strategy_kwargs": { "start_temperature": 5.0, "end_temperature": 1.0, "num_epochs": 10 },
+  "transforms": [
+    { "name": "normalize", "stats": { "video": { "mean": 0.0, "std": 1.0 } } },
+    { "name": "gaussian_noise", "keys": ["video"], "std": 0.1, "p": 0.5 },
+    { "name": "feature_dropout", "p": 0.2 },
+    { "name": "span_masking", "keys": ["video"], "num_spans": 2, "span_len": 3, "p": 1.0 }
+  ],
+  "eval_transforms": [
+    { "name": "normalize", "stats": { "video": { "mean": 0.0, "std": 1.0 } } }
+  ]
+}
