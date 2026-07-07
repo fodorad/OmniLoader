@@ -9,6 +9,13 @@ Releases are managed automatically with
 [Conventional Commits](https://www.conventionalcommits.org/). Future entries will
 list the changes relative to the previous release.
 
+## 1.0.0 (2026-07-07)
+
+
+### Features
+
+* initial public release of OmniLoader ([5814077](https://github.com/fodorad/OmniLoader/commit/58140772992fb70a77865b4bacf5756cbd18da10))
+
 ## 1.0.0 (2026-07-05)
 
 Initial public release. OmniLoader is a modality- and model-agnostic PyTorch meta
