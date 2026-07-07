@@ -1,0 +1,117 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "omniloader"
+dynamic = ["version"]
+description = "A PyTorch meta data loader that unifies disjoint, multi-task video datasets for joint training."
+keywords = ["pytorch", "dataloader", "multi-task-learning", "dataset", "video", "masking", "hdf5"]
+authors = [
+  { name = "fodorad", email = "fodorad201@gmail.com" },
+]
+readme = { "file" = "README.md", "content-type" = "text/markdown" }
+requires-python = ">=3.12"
+license = "MIT"
+classifiers = [
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "torch>=2.0",
+  "numpy",
+  "h5py",
+  "pyyaml",
+]
+
+[project.optional-dependencies]
+lightning = [
+  "lightning>=2.0",
+]
+dev = [
+  "ruff",
+  "ty",
+  "coverage",
+  "pre-commit",
+]
+docs = [
+  "sphinx>=8.0",
+  "furo",
+  "sphinx-autoapi",
+  "sphinx-autobuild",
+  "myst-parser",
+]
+all = [
+  "omniloader[lightning]",
+]
+
+[project.scripts]
+omniloader = "omniloader.cli:main"
+
+[project.urls]
+Documentation = "https://fodorad.github.io/OmniLoader/"
+Issues = "https://github.com/fodorad/OmniLoader/issues"
+Source = "https://github.com/fodorad/OmniLoader"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["omniloader"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "TCH", "ARG", "PIE", "D"]
+ignore = [
+  "D107",  # Missing docstring in __init__ (covered by class docstring)
+  "D203",  # Blank line before class (conflicts with D211)
+  "D213",  # Multi-line summary second line (conflicts with D212)
+]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["D104"]
+"tests/**/test_*.py" = ["D", "S", "ARG"]
+"tests/fixtures.py" = ["D"]
+"docs/conf.py" = ["D", "ARG"]
+
+[tool.coverage.run]
+source = ["omniloader"]
+omit = [
+  "*/tests/*",
+  "*/__init__.py",
+  # Lightning glue is exercised via integration when Lightning is installed;
+  # its import guard and loader wiring are covered by tests/integrations.
+  "omniloader/integrations/lightning.py",
+]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "coverage_html"
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[dependency-groups]
+dev = [
+  "ruff",
+  "ty",
+  "coverage",
+]

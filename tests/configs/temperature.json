@@ -1,0 +1,8 @@
+{
+  "seed": 42,
+  "batch_size": 8,
+  "num_workers": 0,
+  "pad_features": true,
+  "strategy": "temperature",
+  "strategy_kwargs": { "temperature": 2.0 }
+}

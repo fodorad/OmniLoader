@@ -1,0 +1,211 @@
+# =============================================================================
+# OmniLoader — annotated configuration template
+# =============================================================================
+# A single JSON/YAML file describes an entire run. Load it with:
+#
+#     from omniloader import OmniConfig
+#     config = OmniConfig.from_file("config.yaml")
+#     train_loader = config.build_dataloader(training=True)
+#     val_loader   = config.build_dataloader(training=False)  # augmentations off
+#
+# Every key below is OPTIONAL and shown with its default unless marked REQUIRED.
+# Delete anything you do not need — unknown keys are ignored, defaults fill gaps.
+# The only section you almost always must write yourself is `datasets`.
+#
+# Shape vocabulary (modality-agnostic): a value is a *vector* (shape () or (F,))
+# or a *sequence* (shape (T,) or (T, F)). It is a sequence exactly when its spec
+# sets `time_dim`.
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# 1. Reproducibility & DataLoader runtime
+# -----------------------------------------------------------------------------
+seed: 42                  # Global RNG seed (Python/NumPy/PyTorch + samplers).
+batch_size: 32            # Per-step batch size (ignored when `bucketing` is set;
+                          # bucketing carries its own batch_size — see block 7).
+num_workers: 0            # DataLoader worker processes (0 = load in main process).
+pin_memory: false         # Pin host memory for faster host->GPU copies.
+persistent_workers: false # Keep workers alive between epochs (needs num_workers > 0).
+prefetch_factor: null     # Batches prefetched per worker (needs num_workers > 0;
+                          # null = PyTorch default).
+
+pad_features: true        # true  -> pad/crop every sequence to its spec `time_dim`
+                          #          (fixed shapes; masks mark valid steps).
+                          # false -> keep native lengths (enables `dynamic` collate
+                          #          and length `bucketing` to cut padding waste).
+
+
+# -----------------------------------------------------------------------------
+# 2. Datasets  (REQUIRED)  — one entry per source dataset
+# -----------------------------------------------------------------------------
+# Each entry declares an `adapter` (how to read the data), its constructor `args`,
+# and a `schema` (what features/targets it provides). OmniLoader builds the UNION
+# of all schemas: keys a dataset lacks are filled with a placeholder + all-False
+# `<name>_mask`. Specs sharing a name across datasets must agree on shape + dtype.
+datasets:
+  - adapter: hdf5                       # "hdf5" | "npy"
+    args:                              # forwarded to the adapter constructor
+      h5_path: data/dataset_a.h5       # REQUIRED for hdf5
+      subset: train                    # REQUIRED: group name inside the file
+      keys: null                       # null = read all keys in each sample group
+      cache_size: 0                    # LRU sample cache (0 = off)
+      preload: false                   # read the whole subset into RAM up front
+    schema:
+      # A spec is a feature or a target purely by which list it sits in.
+      features:
+        - name: video                  # REQUIRED: key in the sample dict
+          feature_dim: 1024            # trailing feature axis F (null = scalar axis)
+          time_dim: 300                # sequence length T (null = vector, no time axis)
+          dtype: float32               # float32|float64|float16|int64|int32|bool
+          placeholder: 0.0             # fill value where a dataset lacks this key
+      targets:
+        - name: sentiment
+          feature_dim: null            # scalar target -> shape ()
+          time_dim: null
+          dtype: float32
+          placeholder: -5.0            # a sentinel you can ignore in the loss
+        - name: emotion                # a categorical target
+          dtype: int64
+          placeholder: -1              # -1 as an ignore_index for CrossEntropyLoss
+
+  - adapter: npy                        # memory-mapped root/<sample>/<key>.npy layout
+    args:
+      root: data/dataset_b             # REQUIRED: directory of per-sample subdirs
+      keys: null                       # null = infer from the first sample dir
+      mmap: true                       # memory-map arrays (false = load fully)
+    schema:
+      features:
+        - name: audio
+          feature_dim: 128
+          time_dim: 500
+      targets:
+        - name: emotion                # shared name -> merged into the union target
+          dtype: int64
+          placeholder: -1
+
+
+# -----------------------------------------------------------------------------
+# 3. Mixing strategy — how many samples each dataset contributes per epoch
+# -----------------------------------------------------------------------------
+# Only used by training loaders; eval loaders iterate sequentially (full coverage).
+# Pick ONE strategy name; put its extra knobs under `strategy_kwargs`.
+strategy: temperature     # proportional | temperature | annealed_temperature
+                          # | fixed | round_robin
+strategy_kwargs:
+  # --- temperature ---  size ** (1/temperature); T=1 proportional, T=2 sqrt.
+  temperature: 2.0
+  # --- annealed_temperature ---  anneal T from start->end across epochs:
+  # start_temperature: 5.0
+  # end_temperature: 1.0
+  # num_epochs: 10
+  # --- fixed ---  explicit relative weights (one per dataset) + optional size:
+  # weights: [1.0, 1.0]
+  # epoch_size: null      # null = sum of dataset sizes
+  # --- round_robin ---  equal, interleaved draws:
+  # samples_per_dataset: null   # null = size of the smallest dataset
+
+
+# -----------------------------------------------------------------------------
+# 4. Subsampling (optional) — per-dataset within-dataset sampling control
+# -----------------------------------------------------------------------------
+# A list with ONE entry per dataset (same order as `datasets`); use null to leave
+# a dataset untouched. Omit the whole block to disable. Layers on top of block 3.
+subsample: null
+# subsample:
+#   - replacement: false          # allow repeats within an epoch
+#     policy: fresh               # "fresh" (reshuffle) | "exhaust" (drain then refill)
+#     effective_size: null        # override per-epoch count (null = strategy decides)
+#     sample_weights: null        # per-sample weights (length = dataset size), e.g.
+#                                 # class-balanced weights from `class_weights_for_sampler`
+#   - null                        # second dataset: default sampling
+
+
+# -----------------------------------------------------------------------------
+# 5. Transforms — normalization & augmentation pipeline (applied per sample)
+# -----------------------------------------------------------------------------
+# Ordered list; each entry has a `name` plus that transform's kwargs. All are
+# mask-aware (padding/placeholder positions are never touched). Augmentations are
+# train-only and self-skip during evaluation. `keys: null` means "all applicable
+# schema keys". Set `eval_transforms` to override the eval pipeline; when null,
+# `transforms` is reused with augmentations auto-disabled.
+transforms:
+  # --- Normalization (choose the scheme that fits; stats come from compute-stats) ---
+  - name: normalize                     # standardize: (x - mean) / std
+    stats_path: stats.json              # produced by `omniloader compute-stats`;
+                                        # or inline `stats: {...}` instead
+    # keys: null                        # null = every stats key
+  # - name: min_max_normalize           # scale to [0, 1] via min/max
+  #   stats_path: stats.json
+  # - name: robust_normalize            # (x - median) / iqr (outlier-robust)
+  #   stats_path: stats.json
+  # - name: instance_normalize          # per-sample stats (no precomputed file)
+  #   keys: null
+  # - name: per_dataset_normalize       # each sample by its SOURCE dataset's stats
+  #   stats_path: dataset_stats.json    # from `compute-stats --per-dataset`
+  #   fallback: instance                # for unseen sources: instance|union|identity
+  #   union_stats_path: stats.json      # REQUIRED only when fallback: union
+
+  # --- Augmentation (train-only) ---
+  - name: gaussian_noise                # additive feature corruption
+    std: 0.1
+    p: 0.5
+    # keys: null
+  # - name: feature_dropout             # zero whole feature streams (modality dropout)
+  #   p: 0.2
+  #   keep_at_least_one: true
+  # - name: span_masking                # zero contiguous time spans (SpecAugment)
+  #   num_spans: 1
+  #   span_len: 5
+  #   p: 0.5
+  # - name: feature_masking             # zero contiguous feature-dim bands
+  #   num_masks: 1
+  #   max_width: 4
+  #   p: 0.5
+  # - name: time_warp                   # random speed perturbation (float seq only)
+  #   min_rate: 0.8
+  #   max_rate: 1.25
+  #   p: 0.5
+  # - name: random_crop                 # random fixed-length window (aligned keys)
+  #   length: 200
+  # - name: center_crop                 # center window (typical for eval)
+  #   length: 200
+
+eval_transforms: null     # null = reuse `transforms` (augmentations off). Or give
+                          # an explicit list, e.g. [normalize, center_crop].
+
+
+# -----------------------------------------------------------------------------
+# 6. Collate — how samples are stacked into a batch
+# -----------------------------------------------------------------------------
+collate: unified          # unified | dynamic | mixup
+collate_kwargs: {}
+# --- dynamic ---  pad each batch to its own max length (needs pad_features: false):
+#   keys: null            # sequence keys to pad dynamically (null = all sequences)
+# --- mixup ---  MixUp/CutMix at collate time (emits mixup_lambda + paired targets):
+#   base: unified         # underlying collator (unified|dynamic)
+#   alpha: 0.2            # lam ~ Beta(alpha, alpha)
+#   mode: mixup          # mixup (blend) | cutmix (span replacement)
+#   p: 1.0               # per-batch probability of mixing
+
+
+# -----------------------------------------------------------------------------
+# 7. Length bucketing (optional) — group similar-length sequences to cut padding
+# -----------------------------------------------------------------------------
+# Only meaningful with pad_features: false (+ collate: dynamic); a no-op under a
+# fixed time_dim. When set, it drives batching instead of the top-level batch_size.
+bucketing: null
+# bucketing:
+#   key: video              # REQUIRED: sequence key to bucket by
+#   batch_size: 32          # defaults to the top-level batch_size
+#   bucket_multiplier: 20   # pool size in batches (larger = tighter buckets)
+#   drop_last: false
+#   shuffle: true           # defaults to the split (train=true, eval=false)
+
+
+# -----------------------------------------------------------------------------
+# 8. Distributed (DDP) — index sharding across replicas
+# -----------------------------------------------------------------------------
+num_replicas: null        # null = infer from torch.distributed
+rank: null                # null = infer this process's rank
+drop_last: false          # drop the uneven tail when sharding across replicas

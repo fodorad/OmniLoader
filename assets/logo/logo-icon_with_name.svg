@@ -1,0 +1,20 @@
+<svg width="440" height="140" viewBox="0 0 440 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OmniLoader">
+  <defs>
+    <linearGradient id="c1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F97316"/>
+      <stop offset="1" stop-color="#EE4C2C"/>
+    </linearGradient>
+  </defs>
+  <!-- three disjoint lanes merging into one unified stream -->
+  <rect x="20" y="34" width="34" height="14" rx="7" fill="#EE4C2C" opacity="0.55"/>
+  <rect x="20" y="63" width="34" height="14" rx="7" fill="#EE4C2C" opacity="0.8"/>
+  <rect x="20" y="92" width="34" height="14" rx="7" fill="#EE4C2C" opacity="0.4"/>
+  <path d="M58 41 C 84 41, 84 70, 108 70" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+  <path d="M58 70 H 108" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M58 99 C 84 99, 84 70, 108 70" stroke="#EE4C2C" stroke-width="5" stroke-linecap="round" opacity="0.4"/>
+  <rect x="106" y="60" width="40" height="20" rx="10" fill="url(#c1)"/>
+  <!-- wordmark -->
+  <text x="168" y="84" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="-1">
+    <tspan fill="#EE4C2C">Omni</tspan><tspan fill="#7C8B9A">Loader</tspan>
+  </text>
+</svg>
