@@ -9,6 +9,13 @@ Releases are managed automatically with
 [Conventional Commits](https://www.conventionalcommits.org/). Future entries will
 list the changes relative to the previous release.
 
+## [1.1.0](https://github.com/fodorad/OmniLoader/compare/v1.0.0...v1.1.0) (2026-07-25)
+
+
+### Features
+
+* support structured trailing shapes (e.g. image sequences) ([#5](https://github.com/fodorad/OmniLoader/issues/5)) ([d8ec3f9](https://github.com/fodorad/OmniLoader/commit/d8ec3f98752a03c38ca8f972c3dfae7b1607f902))
+
 ## 1.0.0 (2026-07-07)
 
 
