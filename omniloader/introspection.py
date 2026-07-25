@@ -180,10 +180,12 @@ def validate(
                     issues.append(
                         f"{name}[{i}].{spec.name}: expected {expected_ndim}D, got {value.ndim}D"
                     )
-                elif spec.feature_dim is not None and value.shape[-1] != spec.feature_dim:
+                    continue
+                trailing = spec.trailing_shape
+                if trailing and value.shape[value.ndim - len(trailing) :] != trailing:
+                    got = value.shape[value.ndim - len(trailing) :]
                     issues.append(
-                        f"{name}[{i}].{spec.name}: expected feature_dim {spec.feature_dim}, "
-                        f"got {value.shape[-1]}"
+                        f"{name}[{i}].{spec.name}: expected trailing shape {trailing}, got {got}"
                     )
     if strict and issues:
         raise ValueError("Dataset validation failed:\n" + "\n".join(issues))

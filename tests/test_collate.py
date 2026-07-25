@@ -4,6 +4,7 @@ import torch
 
 from omniloader import OmniLoader
 from omniloader.collate import DynamicCollator, unified_collate
+from omniloader.schema.spec import DatasetSchema, TensorSpec, UnifiedSchema
 from tests.fixtures import varlen_dataset
 
 
@@ -20,6 +21,14 @@ class TestUnifiedCollate(unittest.TestCase):
     def test_empty_batch_raises(self):
         with self.assertRaises(ValueError):
             unified_collate([])
+
+    def test_stacks_image_sequences(self):
+        batch = [
+            {"eye_image": torch.randn(5, 3, 8, 8)},
+            {"eye_image": torch.randn(5, 3, 8, 8)},
+        ]
+        out = unified_collate(batch)
+        self.assertEqual(out["eye_image"].shape, (2, 5, 3, 8, 8))
 
 
 class TestDynamicCollator(unittest.TestCase):
@@ -53,6 +62,31 @@ class TestDynamicCollator(unittest.TestCase):
     def test_empty_batch_raises(self):
         with self.assertRaises(ValueError):
             self.collate([])
+
+
+class TestDynamicCollatorStructuredShape(unittest.TestCase):
+    def setUp(self):
+        schema = DatasetSchema(features=[TensorSpec("eye_image", time_dim=8, shape=(3, 4, 4))])
+        self.unified = UnifiedSchema([schema])
+        self.collate = DynamicCollator(self.unified)
+
+    def test_pads_image_sequence_to_batch_max(self):
+        batch = [
+            {
+                "eye_image": torch.randn(3, 3, 4, 4),
+                "eye_image_mask": torch.ones(3, dtype=torch.bool),
+            },
+            {
+                "eye_image": torch.randn(7, 3, 4, 4),
+                "eye_image_mask": torch.ones(7, dtype=torch.bool),
+            },
+        ]
+        out = self.collate(batch)
+        self.assertEqual(out["eye_image"].shape, (2, 7, 3, 4, 4))
+        self.assertEqual(out["eye_image_mask"].shape, (2, 7))
+        self.assertTrue(out["eye_image_mask"][0, :3].all())
+        self.assertFalse(out["eye_image_mask"][0, 3:].any())
+        self.assertTrue(out["eye_image_mask"][1].all())
 
 
 if __name__ == "__main__":

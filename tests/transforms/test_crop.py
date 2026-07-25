@@ -58,6 +58,16 @@ class TestCenterCrop(unittest.TestCase):
         out = CenterCrop(4, keys=["feat"])(sample(), training=False)
         self.assertEqual(out["feat"].shape, (4, 3))
 
+    def test_crops_image_sequence(self):
+        original = torch.randn(10, 3, 4, 4)
+        image_sample = {
+            "eye_image": original.clone(),
+            "eye_image_mask": torch.ones(10, dtype=torch.bool),
+        }
+        out = CenterCrop(4, keys=["eye_image"])(image_sample)
+        self.assertEqual(out["eye_image"].shape, (4, 3, 4, 4))
+        self.assertTrue(torch.equal(out["eye_image"], original[3:7]))
+
 
 if __name__ == "__main__":
     unittest.main()

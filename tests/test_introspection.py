@@ -69,7 +69,7 @@ class TestValidate(unittest.TestCase):
         ds = DictTensorDataset({"x": torch.randn(4, 6, 4)})
         schema = DatasetSchema(features=[TensorSpec("x", feature_dim=99, time_dim=6)])
         issues = validate([ds], [schema])
-        self.assertTrue(any("feature_dim" in msg for msg in issues))
+        self.assertTrue(any("trailing shape" in msg for msg in issues))
 
     def test_detects_rank_mismatch(self):
         # Schema declares a scalar target but data provides a sequence.
@@ -95,6 +95,25 @@ class TestValidate(unittest.TestCase):
     def test_loader_validate_method(self):
         ds, schema = valence_dataset(n=4)
         self.assertEqual(OmniLoader([ds], [schema]).validate(), [])
+
+    def test_detects_structured_shape_mismatch(self):
+        # Schema declares (3, 64, 64) but data provides (3, 32, 32).
+        ds = DictTensorDataset({"eye_image": torch.randn(4, 6, 3, 32, 32)})
+        schema = DatasetSchema(features=[TensorSpec("eye_image", shape=(3, 64, 64), time_dim=6)])
+        issues = validate([ds], [schema])
+        self.assertTrue(any("trailing shape" in msg for msg in issues))
+
+    def test_clean_structured_shape_has_no_issues(self):
+        ds = DictTensorDataset({"eye_image": torch.randn(4, 6, 3, 8, 8)})
+        schema = DatasetSchema(features=[TensorSpec("eye_image", shape=(3, 8, 8), time_dim=6)])
+        self.assertEqual(validate([ds], [schema]), [])
+
+    def test_describe_reports_image_key_coverage(self):
+        ds = DictTensorDataset({"eye_image": torch.randn(4, 6, 3, 8, 8)})
+        schema = DatasetSchema(features=[TensorSpec("eye_image", shape=(3, 8, 8), time_dim=6)])
+        report = describe([ds], [schema])
+        self.assertIn("eye_image", report.union_keys)
+        self.assertAlmostEqual(report.valid_fraction["eye_image"], 1.0)
 
 
 if __name__ == "__main__":

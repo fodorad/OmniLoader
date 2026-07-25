@@ -91,6 +91,24 @@ class TestMixupCollator(unittest.TestCase):
         with self.assertRaises(ValueError):
             MixupCollator(unified_collate, schema(), mode="bogus")
 
+    def test_mixup_blends_image_sequence(self):
+        image_schema = UnifiedSchema(
+            [DatasetSchema(features=[TensorSpec("eye_image", time_dim=4, shape=(3, 4, 4))])]
+        )
+        image_batch = [
+            {
+                "eye_image": torch.full((4, 3, 4, 4), float(i)),
+                "eye_image_mask": torch.ones(4, dtype=torch.bool),
+            }
+            for i in range(4)
+        ]
+        collate = MixupCollator(
+            unified_collate, image_schema, alpha=1.0, mode="mixup", p=1.0, seed=0
+        )
+        out = collate(image_batch)
+        self.assertEqual(out["eye_image"].shape, (4, 4, 3, 4, 4))
+        self.assertTrue(out["eye_image"].min() >= 0.0 and out["eye_image"].max() <= 3.0)
+
 
 if __name__ == "__main__":
     unittest.main()

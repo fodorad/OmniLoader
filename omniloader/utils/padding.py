@@ -5,7 +5,6 @@ sequences to a fixed target length and produce the matching validity masks.
 """
 
 import torch
-import torch.nn.functional as F
 
 
 def pad_or_crop_time_dim(
@@ -13,10 +12,12 @@ def pad_or_crop_time_dim(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Adjust the time dimension (T) of a tensor to a given size and generate a mask.
 
-    Handles tensors of shape ``(T, F)`` or ``(T,)``.
+    Operates on axis 0 only and is agnostic to the rank of the trailing axes, so
+    it handles ``(T,)``, ``(T, F)`` and structured sequences such as ``(T, C, H, W)``
+    alike.
 
     Args:
-        tensor: Input tensor with shape ``(T, F)`` or ``(T,)``.
+        tensor: Input tensor with shape ``(T, *trailing)``.
         target_size: Desired size for the time dimension.
         pad_value: Value to use for padding. Defaults to 0.
 
@@ -26,16 +27,12 @@ def pad_or_crop_time_dim(
         ``False`` for padded positions.
 
     """
-    is_vector = tensor.ndim == 1
-    if is_vector:
-        tensor = tensor[:, None]
-
     current_size = tensor.shape[0]
 
     if current_size < target_size:
         pad_amount = target_size - current_size
-        padding = (0, 0, 0, pad_amount)
-        result = F.pad(tensor, padding, mode="constant", value=pad_value)
+        pad = tensor.new_full((pad_amount, *tensor.shape[1:]), pad_value)
+        result = torch.cat([tensor, pad], dim=0)
         mask = torch.cat(
             [
                 torch.ones(current_size, dtype=torch.bool),
@@ -43,14 +40,11 @@ def pad_or_crop_time_dim(
             ]
         )
     elif current_size > target_size:
-        result = tensor[:target_size, :]
+        result = tensor[:target_size]
         mask = torch.ones(target_size, dtype=torch.bool)
     else:
         result = tensor
         mask = torch.ones(current_size, dtype=torch.bool)
-
-    if is_vector:
-        result = result.squeeze(1)
 
     return result, mask
 

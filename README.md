@@ -47,7 +47,9 @@ it does not reinvent batching.
 OmniLoader is **modality-, dataset- and model-agnostic** — it knows nothing about video,
 audio, text, which specific corpora you loaded, or any model. Everything is described
 structurally as **vectors** (shape `()` or `(F,)`) and **sequences** (shape `(T,)` or
-`(T, F)`); a value is a sequence exactly when its spec sets `time_dim`.
+`(T, F)`); a value is a sequence exactly when its spec sets `time_dim`. A value can also
+be **structured** — e.g. an image `(C, H, W)` — by setting `shape` instead of
+`feature_dim`, yielding `(*shape,)` or, for a sequence, `(T, *shape)`.
 
 Beyond this core unification and its utilities (schema declaration, dataset adapters,
 splits, introspection), OmniLoader also ships the surrounding machinery a joint training
@@ -65,7 +67,7 @@ weights and loss weights), and a mask-aware transform pipeline of **normalizatio
 | **Core** | `OmniLoader` | Concatenates disjoint datasets into one masked, unified stream |
 | | `SampleUnifier` | Maps a raw sample onto the union schema; fills gaps with placeholder + `<name>_mask` |
 | | `unified_collate` | Stacks tensors, lists metadata |
-| **Schema** | `TensorSpec` | Declare a value (feature or target): `feature_dim`, `time_dim`, dtype, placeholder |
+| **Schema** | `TensorSpec` | Declare a value (feature or target): `feature_dim`/`shape`, `time_dim`, dtype, placeholder |
 | | `DatasetSchema` / `UnifiedSchema` | Per-dataset specs; merged + validated union |
 | | vector / sequence | Structural, modality-agnostic (`()`, `(F,)`, `(T,)`, `(T,F)`) |
 | **Datasets** | `HDF5Dataset` | Per-sample HDF5 groups; worker-safe; `cache_size`/`preload` |
@@ -187,13 +189,28 @@ is set by whether it goes in `features=` or `targets=`):
 | Field | Meaning |
 |-------|---------|
 | `name` | key in the sample dict |
-| `feature_dim` | trailing feature size `F`, or `None` for a scalar along that axis |
+| `feature_dim` | trailing feature size `F`, or `None` for a scalar along that axis. Sugar for `shape=(F,)` |
+| `shape` | full trailing shape for structured values (e.g. an image `(C, H, W)`); mutually exclusive with `feature_dim` |
 | `time_dim` | sequence length `T`; **set it to make the value a sequence** (padded/cropped to this). `None` → vector |
 | `dtype` | `torch.float32`, `torch.int64`, … (class ids use an int dtype) |
 | `placeholder` | fill value when a dataset lacks the key (e.g. `-1` ignore-index for classes) |
 
-The four representable shapes are `()`, `(F,)`, `(T,)` and `(T, F)`. The mask
-matches the sequence axis: `(T,)` for sequences, scalar `()` for vectors.
+The representable shapes are `()`, `(F,)`, `(T,)`, `(T, F)` and, with `shape` set,
+`(*shape,)` or `(T, *shape)` for a structured (e.g. image-sequence) value:
+
+```python
+TensorSpec(
+    name="eye_image",
+    time_dim=15,           # T
+    shape=(3, 64, 64),     # C, H, W
+    dtype=torch.float32,
+)
+# value_shape == (15, 3, 64, 64); mask_shape == (15,), one flag per frame
+```
+
+The mask matches the sequence axis: `(T,)` for sequences, scalar `()` for vectors —
+a structured sequence is masked exactly like a feature sequence (one flag per time
+step; no per-pixel masking).
 
 ---
 

@@ -45,6 +45,15 @@ class TestStatsNormalizers(unittest.TestCase):
         self.assertEqual(float(out["x"][1, 0]), 99.0)  # padding untouched
 
 
+class TestStatsNormalizersImageSequence(unittest.TestCase):
+    def test_normalize_image_sequence(self):
+        # (T, C, H, W): stats broadcast over the whole trailing shape.
+        value = torch.full((3, 2, 4, 4), 6.0)
+        sample = {"eye_image": value, "eye_image_mask": torch.ones(3, dtype=torch.bool)}
+        out = Normalize({"eye_image": (2.0, 2.0)})(sample)
+        self.assertTrue(torch.allclose(out["eye_image"], torch.full((3, 2, 4, 4), 2.0)))
+
+
 class TestInstanceNormalize(unittest.TestCase):
     def test_sequence_zero_mean_unit_std(self):
         out = InstanceNormalize(keys=["x"])(make_sample([[1.0], [3.0], [5.0]]))
