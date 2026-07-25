@@ -219,3 +219,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Scratch space for local notes and plans; never committed.
+tmp/
