@@ -65,20 +65,38 @@ Module Contents
    determined by whether it is placed in :attr:`DatasetSchema.features` or
    :attr:`DatasetSchema.targets`.
 
-   The shape is derived from two independent, optional axes:
+   The shape is derived from two independent, optional axes plus an optional
+   trailing shape:
 
    * ``time_dim`` — length ``T`` of the sequence axis. When ``None`` the value
      is a **vector** (no sequence axis); when set the value is a **sequence**.
    * ``feature_dim`` — size ``F`` of the trailing feature axis. When ``None``
-     the value is a **scalar** along that axis.
+     the value is a **scalar** along that axis. Sugar for ``shape=(F,)``.
+   * ``shape`` — the full trailing shape for **structured** values that are
+     not a single flat feature axis, e.g. an image ``(C, H, W)``. Mutually
+     exclusive with ``feature_dim``.
 
-   So the four representable shapes are ``()``, ``(F,)``, ``(T,)`` and
-   ``(T, F)`` — covering scalar labels, feature vectors, scalar sequences
-   (e.g. one value per step) and feature sequences.
+   So the representable shapes are ``()``, ``(F,)``, ``(T,)``, ``(T, F)`` and,
+   with ``shape`` set, ``(*shape,)`` or ``(T, *shape)`` — covering scalar
+   labels, feature vectors, scalar sequences (e.g. one value per step),
+   feature sequences, and structured (e.g. image) sequences::
+
+       TensorSpec(
+           name="eye_image",
+           time_dim=15,           # T
+           shape=(3, 64, 64),     # C, H, W
+           dtype=torch.float32,
+       )
+       # value_shape == (15, 3, 64, 64); mask_shape == (15,)
+
+   A structured value is masked exactly like a feature sequence: one flag per
+   time step, valid or not as a whole (no per-pixel masking).
 
    :param name: Unique key under which the value appears in a sample dict.
    :param feature_dim: Size of the trailing feature axis ``F``. ``None`` for a
-                       scalar along that axis.
+                       scalar along that axis. Mutually exclusive with ``shape``.
+   :param shape: Full trailing (non-time) shape, for structured values such as
+                 images. Mutually exclusive with ``feature_dim``.
    :param time_dim: Length ``T`` of the sequence axis. ``None`` for a vector.
    :param dtype: Element dtype, as a :class:`torch.dtype` or string name.
    :param placeholder: Fill value used when a dataset does not provide this key.
@@ -98,14 +116,23 @@ Module Contents
       Whether the value has a sequence axis (``time_dim`` is set).
 
 
+   .. py:property:: trailing_shape
+      :type: tuple[int, Ellipsis]
+
+
+      The non-time trailing shape, from ``shape`` or ``feature_dim``.
+
+      :returns: ``self.shape`` if set, else ``(feature_dim,)`` if set, else ``()``.
+
+
    .. py:property:: value_shape
       :type: tuple[int, Ellipsis]
 
 
       Shape of the placeholder value tensor for a single sample.
 
-      :returns: One of ``()``, ``(F,)``, ``(T,)`` or ``(T, F)`` depending on which
-                of ``time_dim`` and ``feature_dim`` are set.
+      :returns: ``trailing_shape``, prefixed with ``time_dim`` when the spec is a
+                sequence.
 
 
    .. py:property:: mask_shape

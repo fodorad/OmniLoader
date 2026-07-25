@@ -349,21 +349,39 @@
 <span class="sd">    determined by whether it is placed in :attr:`DatasetSchema.features` or</span>
 <span class="sd">    :attr:`DatasetSchema.targets`.</span>
 
-<span class="sd">    The shape is derived from two independent, optional axes:</span>
+<span class="sd">    The shape is derived from two independent, optional axes plus an optional</span>
+<span class="sd">    trailing shape:</span>
 
 <span class="sd">    * ``time_dim`` — length ``T`` of the sequence axis. When ``None`` the value</span>
 <span class="sd">      is a **vector** (no sequence axis); when set the value is a **sequence**.</span>
 <span class="sd">    * ``feature_dim`` — size ``F`` of the trailing feature axis. When ``None``</span>
-<span class="sd">      the value is a **scalar** along that axis.</span>
+<span class="sd">      the value is a **scalar** along that axis. Sugar for ``shape=(F,)``.</span>
+<span class="sd">    * ``shape`` — the full trailing shape for **structured** values that are</span>
+<span class="sd">      not a single flat feature axis, e.g. an image ``(C, H, W)``. Mutually</span>
+<span class="sd">      exclusive with ``feature_dim``.</span>
 
-<span class="sd">    So the four representable shapes are ``()``, ``(F,)``, ``(T,)`` and</span>
-<span class="sd">    ``(T, F)`` — covering scalar labels, feature vectors, scalar sequences</span>
-<span class="sd">    (e.g. one value per step) and feature sequences.</span>
+<span class="sd">    So the representable shapes are ``()``, ``(F,)``, ``(T,)``, ``(T, F)`` and,</span>
+<span class="sd">    with ``shape`` set, ``(*shape,)`` or ``(T, *shape)`` — covering scalar</span>
+<span class="sd">    labels, feature vectors, scalar sequences (e.g. one value per step),</span>
+<span class="sd">    feature sequences, and structured (e.g. image) sequences::</span>
+
+<span class="sd">        TensorSpec(</span>
+<span class="sd">            name=&quot;eye_image&quot;,</span>
+<span class="sd">            time_dim=15,           # T</span>
+<span class="sd">            shape=(3, 64, 64),     # C, H, W</span>
+<span class="sd">            dtype=torch.float32,</span>
+<span class="sd">        )</span>
+<span class="sd">        # value_shape == (15, 3, 64, 64); mask_shape == (15,)</span>
+
+<span class="sd">    A structured value is masked exactly like a feature sequence: one flag per</span>
+<span class="sd">    time step, valid or not as a whole (no per-pixel masking).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: Unique key under which the value appears in a sample dict.</span>
 <span class="sd">        feature_dim: Size of the trailing feature axis ``F``. ``None`` for a</span>
-<span class="sd">            scalar along that axis.</span>
+<span class="sd">            scalar along that axis. Mutually exclusive with ``shape``.</span>
+<span class="sd">        shape: Full trailing (non-time) shape, for structured values such as</span>
+<span class="sd">            images. Mutually exclusive with ``feature_dim``.</span>
 <span class="sd">        time_dim: Length ``T`` of the sequence axis. ``None`` for a vector.</span>
 <span class="sd">        dtype: Element dtype, as a :class:`torch.dtype` or string name.</span>
 <span class="sd">        placeholder: Fill value used when a dataset does not provide this key.</span>
@@ -373,6 +391,7 @@
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">feature_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">time_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
     <span class="n">placeholder</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -382,8 +401,17 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and normalise field values.&quot;&quot;&quot;</span>
         <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="n">resolve_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> cannot set both feature_dim and shape; &quot;</span>
+                <span class="s2">&quot;feature_dim is sugar for shape=(F,)&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> feature_dim must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">dim</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> shape dims must all be positive&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> time_dim must be positive&quot;</span><span class="p">)</span></div>
 
@@ -394,19 +422,32 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trailing_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The non-time trailing shape, from ``shape`` or ``feature_dim``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ``self.shape`` if set, else ``(feature_dim,)`` if set, else ``()``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span><span class="p">,)</span>
+        <span class="k">return</span> <span class="p">()</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Shape of the placeholder value tensor for a single sample.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            One of ``()``, ``(F,)``, ``(T,)`` or ``(T, F)`` depending on which</span>
-<span class="sd">            of ``time_dim`` and ``feature_dim`` are set.</span>
+<span class="sd">            ``trailing_shape``, prefixed with ``time_dim`` when the spec is a</span>
+<span class="sd">            sequence.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span><span class="p">)</span>
+        <span class="n">dims</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trailing_shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
 
     <span class="nd">@property</span>

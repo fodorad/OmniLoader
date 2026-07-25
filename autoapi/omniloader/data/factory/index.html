@@ -298,12 +298,17 @@ are ever constructed — never models.</p>
   <span class="s2">&quot;adapter&quot;</span><span class="p">:</span> <span class="s2">&quot;hdf5&quot;</span><span class="p">,</span>
   <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;h5_path&quot;</span><span class="p">:</span> <span class="s2">&quot;data/mosei.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;subset&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">},</span>
   <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;feature_dim&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="s2">&quot;time_dim&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">}],</span>
+    <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;feature_dim&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="s2">&quot;time_dim&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;eye_image&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span> <span class="s2">&quot;time_dim&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+    <span class="p">],</span>
     <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sentiment&quot;</span><span class="p">,</span> <span class="s2">&quot;placeholder&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">}]</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">shape</span></code> declares a structured (e.g. image) trailing shape instead of a flat
+feature vector; see <a class="reference internal" href="../../schema/spec/index.html#omniloader.schema.spec.TensorSpec" title="omniloader.schema.spec.TensorSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorSpec</span></code></a>.</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">

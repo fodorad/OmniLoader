@@ -293,10 +293,16 @@
 <span class="sd">      &quot;adapter&quot;: &quot;hdf5&quot;,</span>
 <span class="sd">      &quot;args&quot;: {&quot;h5_path&quot;: &quot;data/mosei.h5&quot;, &quot;subset&quot;: &quot;train&quot;},</span>
 <span class="sd">      &quot;schema&quot;: {</span>
-<span class="sd">        &quot;features&quot;: [{&quot;name&quot;: &quot;video&quot;, &quot;feature_dim&quot;: 1024, &quot;time_dim&quot;: 300}],</span>
+<span class="sd">        &quot;features&quot;: [</span>
+<span class="sd">          {&quot;name&quot;: &quot;video&quot;, &quot;feature_dim&quot;: 1024, &quot;time_dim&quot;: 300},</span>
+<span class="sd">          {&quot;name&quot;: &quot;eye_image&quot;, &quot;shape&quot;: [3, 64, 64], &quot;time_dim&quot;: 15}</span>
+<span class="sd">        ],</span>
 <span class="sd">        &quot;targets&quot;: [{&quot;name&quot;: &quot;sentiment&quot;, &quot;placeholder&quot;: -5.0}]</span>
 <span class="sd">      }</span>
 <span class="sd">    }</span>
+
+<span class="sd">``shape`` declares a structured (e.g. image) trailing shape instead of a flat</span>
+<span class="sd">feature vector; see :class:`~omniloader.schema.spec.TensorSpec`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>

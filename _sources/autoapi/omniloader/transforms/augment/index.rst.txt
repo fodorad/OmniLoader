@@ -141,12 +141,18 @@ Module Contents
    ``max_width`` are zeroed across all time steps — the feature-axis analogue of
    :class:`SpanMasking`.
 
+   Not supported for structured (e.g. image-sequence) specs, which have no
+   single trailing feature axis to band-mask — a spec's trailing shape is
+   checked against ``schema`` when available (either passed directly, or via
+   ``keys=None``); use :class:`SpanMasking` to mask whole time steps instead.
+
    :param num_masks: Number of feature-dimension bands to zero per key.
    :param max_width: Maximum band width along the feature axis.
    :param keys: Feature keys to mask. When ``None``, every feature in the schema is
                 used (requires ``schema``).
    :param p: Per-sample probability of masking each eligible key.
-   :param schema: Schema used to resolve ``keys`` when it is ``None``.
+   :param schema: Schema used to resolve ``keys`` when it is ``None``, and to
+                  reject structured (image-sequence) keys ahead of time.
 
 
    .. py:method:: apply(sample: omniloader.transforms.base.Sample, generator: torch.Generator | None) -> omniloader.transforms.base.Sample

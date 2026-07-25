@@ -440,6 +440,10 @@ floating-point sequence feature keys in the schema are used.</p></li>
 <p>For each targeted key with a feature axis, <code class="docutils literal notranslate"><span class="pre">num_masks</span></code> bands of width up to
 <code class="docutils literal notranslate"><span class="pre">max_width</span></code> are zeroed across all time steps — the feature-axis analogue of
 <a class="reference internal" href="#omniloader.transforms.augment.SpanMasking" title="omniloader.transforms.augment.SpanMasking"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMasking</span></code></a>.</p>
+<p>Not supported for structured (e.g. image-sequence) specs, which have no
+single trailing feature axis to band-mask — a spec’s trailing shape is
+checked against <code class="docutils literal notranslate"><span class="pre">schema</span></code> when available (either passed directly, or via
+<code class="docutils literal notranslate"><span class="pre">keys=None</span></code>); use <a class="reference internal" href="#omniloader.transforms.augment.SpanMasking" title="omniloader.transforms.augment.SpanMasking"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMasking</span></code></a> to mask whole time steps instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -448,7 +452,8 @@ floating-point sequence feature keys in the schema are used.</p></li>
 <li><p><strong>keys</strong> – Feature keys to mask. When <code class="docutils literal notranslate"><span class="pre">None</span></code>, every feature in the schema is
 used (requires <code class="docutils literal notranslate"><span class="pre">schema</span></code>).</p></li>
 <li><p><strong>p</strong> – Per-sample probability of masking each eligible key.</p></li>
-<li><p><strong>schema</strong> – Schema used to resolve <code class="docutils literal notranslate"><span class="pre">keys</span></code> when it is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>schema</strong> – Schema used to resolve <code class="docutils literal notranslate"><span class="pre">keys</span></code> when it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, and to
+reject structured (image-sequence) keys ahead of time.</p></li>
 </ul>
 </dd>
 </dl>

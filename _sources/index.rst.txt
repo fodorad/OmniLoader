@@ -27,7 +27,9 @@ It is a map-style :class:`torch.utils.data.Dataset` you wrap in an ordinary
 OmniLoader is **modality-, dataset- and model-agnostic**: it knows nothing about video,
 audio, text, which specific corpora you loaded, or any model. It reasons only about
 **vectors** (shape ``()`` or ``(F,)``) and **sequences** (shape ``(T,)`` or
-``(T, F)``); a value is a sequence exactly when its spec sets ``time_dim``.
+``(T, F)``); a value is a sequence exactly when its spec sets ``time_dim``. A value
+can also be **structured** — e.g. an image ``(C, H, W)`` — by setting ``shape``
+instead of ``feature_dim``, yielding ``(*shape,)`` or, for a sequence, ``(T, *shape)``.
 
 Beyond this core unification and its utilities (schema declaration, dataset adapters,
 splits, introspection), OmniLoader also ships the surrounding machinery a joint
@@ -62,7 +64,8 @@ Feature overview
      - Stacks tensors, lists metadata.
    * - **Schema**
      - :class:`~omniloader.schema.spec.TensorSpec`
-     - Declare a value (feature or target): ``feature_dim``, ``time_dim``, dtype, placeholder.
+     - Declare a value (feature or target): ``feature_dim``/``shape``, ``time_dim``,
+       dtype, placeholder.
    * -
      - :class:`~omniloader.schema.spec.DatasetSchema` / :class:`~omniloader.schema.spec.UnifiedSchema`
      - Per-dataset specs; merged + validated union.
@@ -230,6 +233,19 @@ ready ``DataLoader`` from it:
    config = OmniConfig.from_file("config.yaml")
    train_loader = config.build_dataloader(training=True)
    val_loader = config.build_dataloader(training=False)  # sequential, augmentations off
+
+A feature that is not a flat vector — e.g. a window of raw image frames — declares
+``shape`` instead of ``feature_dim`` in its spec, either in Python or the same YAML:
+
+.. code-block:: python
+
+   TensorSpec(
+       name="eye_image",
+       time_dim=15,           # T
+       shape=(3, 64, 64),     # C, H, W
+       dtype=torch.float32,
+   )
+   # value_shape == (15, 3, 64, 64); mask_shape == (15,), one flag per frame
 
 Indices and tables
 -------------------

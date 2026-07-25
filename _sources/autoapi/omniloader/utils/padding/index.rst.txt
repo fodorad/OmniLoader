@@ -29,9 +29,11 @@ Module Contents
 
    Adjust the time dimension (T) of a tensor to a given size and generate a mask.
 
-   Handles tensors of shape ``(T, F)`` or ``(T,)``.
+   Operates on axis 0 only and is agnostic to the rank of the trailing axes, so
+   it handles ``(T,)``, ``(T, F)`` and structured sequences such as ``(T, C, H, W)``
+   alike.
 
-   :param tensor: Input tensor with shape ``(T, F)`` or ``(T,)``.
+   :param tensor: Input tensor with shape ``(T, *trailing)``.
    :param target_size: Desired size for the time dimension.
    :param pad_value: Value to use for padding. Defaults to 0.
 
