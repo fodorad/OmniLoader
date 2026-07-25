@@ -31,6 +31,37 @@ if TYPE_CHECKING:
     from omniloader.schema.spec import UnifiedSchema
 
 
+def _reject_structured_keys(
+    schema: UnifiedSchema | None, keys: Sequence[str], transform: str
+) -> None:
+    """Raise if any ``keys`` is a structured (rank > 1 trailing shape) spec.
+
+    Args:
+        schema: Schema to resolve specs from. A no-op when ``None`` (the caller
+            has no schema to check against ahead of time).
+        keys: Candidate keys to check.
+        transform: Name of the calling transform, for the error message.
+
+    Raises:
+        ValueError: If any key's trailing shape has more than one axis.
+
+    """
+    if schema is None:
+        return
+    for key in keys:
+        try:
+            spec = schema.spec(key)
+        except KeyError:
+            continue
+        trailing = spec.trailing_shape
+        if len(trailing) > 1:
+            raise ValueError(
+                f"{transform} only supports a single trailing feature axis; "
+                f"spec {key!r} has trailing shape {trailing}, which has no single "
+                "feature axis. Not supported for image/structured sequences."
+            )
+
+
 class GaussianNoise(Transform):
     """Add zero-mean Gaussian noise to feature values (feature corruption).
 
@@ -206,6 +237,7 @@ class TimeWarp(Transform):
                 for spec in schema.features
                 if spec.is_sequence and spec.dtype.is_floating_point
             ]
+        _reject_structured_keys(schema, self.keys, "TimeWarp")
         self.min_rate = min_rate
         self.max_rate = max_rate
         self.p = p
@@ -219,6 +251,12 @@ class TimeWarp(Transform):
             if key not in sample:
                 continue
             value = sample[key].to(torch.float32)  # (T, F) or (T,)
+            if value.ndim > 2:
+                raise ValueError(
+                    "TimeWarp only supports scalar/feature-vector sequences (T,)/(T, F); "
+                    "image-sequence specs would be linearly blended frame-to-frame, which "
+                    f"distorts video content. Got key {key!r} with shape {tuple(value.shape)}."
+                )
             length = value.shape[0]
             new_len = max(1, round(length * rate))
             squeeze = value.ndim == 1
@@ -237,13 +275,19 @@ class FeatureMasking(Transform):
     ``max_width`` are zeroed across all time steps — the feature-axis analogue of
     :class:`SpanMasking`.
 
+    Not supported for structured (e.g. image-sequence) specs, which have no
+    single trailing feature axis to band-mask — a spec's trailing shape is
+    checked against ``schema`` when available (either passed directly, or via
+    ``keys=None``); use :class:`SpanMasking` to mask whole time steps instead.
+
     Args:
         num_masks: Number of feature-dimension bands to zero per key.
         max_width: Maximum band width along the feature axis.
         keys: Feature keys to mask. When ``None``, every feature in the schema is
             used (requires ``schema``).
         p: Per-sample probability of masking each eligible key.
-        schema: Schema used to resolve ``keys`` when it is ``None``.
+        schema: Schema used to resolve ``keys`` when it is ``None``, and to
+            reject structured (image-sequence) keys ahead of time.
 
     """
 
@@ -258,6 +302,7 @@ class FeatureMasking(Transform):
         schema: UnifiedSchema | None = None,
     ) -> None:
         self.keys = resolve_keys(keys, schema)
+        _reject_structured_keys(schema, self.keys, "FeatureMasking")
         self.num_masks = num_masks
         self.max_width = max_width
         self.p = p

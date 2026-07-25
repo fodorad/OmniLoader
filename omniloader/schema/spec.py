@@ -62,21 +62,39 @@ class TensorSpec:
     determined by whether it is placed in :attr:`DatasetSchema.features` or
     :attr:`DatasetSchema.targets`.
 
-    The shape is derived from two independent, optional axes:
+    The shape is derived from two independent, optional axes plus an optional
+    trailing shape:
 
     * ``time_dim`` — length ``T`` of the sequence axis. When ``None`` the value
       is a **vector** (no sequence axis); when set the value is a **sequence**.
     * ``feature_dim`` — size ``F`` of the trailing feature axis. When ``None``
-      the value is a **scalar** along that axis.
+      the value is a **scalar** along that axis. Sugar for ``shape=(F,)``.
+    * ``shape`` — the full trailing shape for **structured** values that are
+      not a single flat feature axis, e.g. an image ``(C, H, W)``. Mutually
+      exclusive with ``feature_dim``.
 
-    So the four representable shapes are ``()``, ``(F,)``, ``(T,)`` and
-    ``(T, F)`` — covering scalar labels, feature vectors, scalar sequences
-    (e.g. one value per step) and feature sequences.
+    So the representable shapes are ``()``, ``(F,)``, ``(T,)``, ``(T, F)`` and,
+    with ``shape`` set, ``(*shape,)`` or ``(T, *shape)`` — covering scalar
+    labels, feature vectors, scalar sequences (e.g. one value per step),
+    feature sequences, and structured (e.g. image) sequences::
+
+        TensorSpec(
+            name="eye_image",
+            time_dim=15,           # T
+            shape=(3, 64, 64),     # C, H, W
+            dtype=torch.float32,
+        )
+        # value_shape == (15, 3, 64, 64); mask_shape == (15,)
+
+    A structured value is masked exactly like a feature sequence: one flag per
+    time step, valid or not as a whole (no per-pixel masking).
 
     Args:
         name: Unique key under which the value appears in a sample dict.
         feature_dim: Size of the trailing feature axis ``F``. ``None`` for a
-            scalar along that axis.
+            scalar along that axis. Mutually exclusive with ``shape``.
+        shape: Full trailing (non-time) shape, for structured values such as
+            images. Mutually exclusive with ``feature_dim``.
         time_dim: Length ``T`` of the sequence axis. ``None`` for a vector.
         dtype: Element dtype, as a :class:`torch.dtype` or string name.
         placeholder: Fill value used when a dataset does not provide this key.
@@ -86,6 +104,7 @@ class TensorSpec:
 
     name: str
     feature_dim: int | None = None
+    shape: tuple[int, ...] | None = None
     time_dim: int | None = None
     dtype: torch.dtype = torch.float32
     placeholder: float = 0.0
@@ -93,8 +112,17 @@ class TensorSpec:
     def __post_init__(self) -> None:
         """Validate and normalise field values."""
         object.__setattr__(self, "dtype", resolve_dtype(self.dtype))
+        if self.feature_dim is not None and self.shape is not None:
+            raise ValueError(
+                f"Spec {self.name!r} cannot set both feature_dim and shape; "
+                "feature_dim is sugar for shape=(F,)"
+            )
         if self.feature_dim is not None and self.feature_dim <= 0:
             raise ValueError(f"Spec {self.name!r} feature_dim must be positive")
+        if self.shape is not None:
+            object.__setattr__(self, "shape", tuple(self.shape))
+            if not self.shape or any(dim <= 0 for dim in self.shape):
+                raise ValueError(f"Spec {self.name!r} shape dims must all be positive")
         if self.time_dim is not None and self.time_dim <= 0:
             raise ValueError(f"Spec {self.name!r} time_dim must be positive")
 
@@ -104,19 +132,32 @@ class TensorSpec:
         return self.time_dim is not None
 
     @property
+    def trailing_shape(self) -> tuple[int, ...]:
+        """The non-time trailing shape, from ``shape`` or ``feature_dim``.
+
+        Returns:
+            ``self.shape`` if set, else ``(feature_dim,)`` if set, else ``()``.
+
+        """
+        if self.shape is not None:
+            return self.shape
+        if self.feature_dim is not None:
+            return (self.feature_dim,)
+        return ()
+
+    @property
     def value_shape(self) -> tuple[int, ...]:
         """Shape of the placeholder value tensor for a single sample.
 
         Returns:
-            One of ``()``, ``(F,)``, ``(T,)`` or ``(T, F)`` depending on which
-            of ``time_dim`` and ``feature_dim`` are set.
+            ``trailing_shape``, prefixed with ``time_dim`` when the spec is a
+            sequence.
 
         """
         dims: list[int] = []
         if self.time_dim is not None:
             dims.append(self.time_dim)
-        if self.feature_dim is not None:
-            dims.append(self.feature_dim)
+        dims.extend(self.trailing_shape)
         return tuple(dims)
 
     @property

@@ -84,5 +84,31 @@ class TestSampleUnifier(unittest.TestCase):
         self.assertFalse(out2["video_mask"][3:].any())
 
 
+class TestSampleUnifierStructuredShape(unittest.TestCase):
+    def setUp(self):
+        schema_a = DatasetSchema(
+            features=[TensorSpec("eye_image", time_dim=5, shape=(3, 8, 8))],
+        )
+        schema_b = DatasetSchema(features=[TensorSpec("audio", feature_dim=2, time_dim=5)])
+        self.schema = UnifiedSchema([schema_a, schema_b])
+        self.unifier = SampleUnifier(self.schema)
+
+    def test_pads_image_sequence(self):
+        out = self.unifier({"eye_image": torch.randn(3, 3, 8, 8)})
+        self.assertEqual(out["eye_image"].shape, (5, 3, 8, 8))
+        self.assertTrue(out["eye_image_mask"][:3].all())
+        self.assertFalse(out["eye_image_mask"][3:].any())
+
+    def test_crops_image_sequence(self):
+        out = self.unifier({"eye_image": torch.randn(9, 3, 8, 8)})
+        self.assertEqual(out["eye_image"].shape, (5, 3, 8, 8))
+        self.assertTrue(out["eye_image_mask"].all())
+
+    def test_missing_image_key_is_placeholder(self):
+        out = self.unifier({"audio": torch.randn(5, 2)})
+        self.assertEqual(out["eye_image"].shape, (5, 3, 8, 8))
+        self.assertFalse(out["eye_image_mask"].any())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -36,6 +36,28 @@ class TestPadOrCrop(unittest.TestCase):
         self.assertTrue(torch.all(out[3:] == -1))
         self.assertFalse(mask[3:].any())
 
+    def test_pad_rank3_image_sequence(self):
+        x = torch.randn(3, 4, 5)
+        out, mask = pad_or_crop_time_dim(x, 6, pad_value=-1)
+        self.assertEqual(out.shape, (6, 4, 5))
+        self.assertTrue(torch.equal(out[:3], x))
+        self.assertTrue(torch.all(out[3:] == -1))
+        self.assertTrue(mask[:3].all())
+        self.assertFalse(mask[3:].any())
+
+    def test_crop_rank4_image_sequence(self):
+        x = torch.randn(8, 3, 4, 4)
+        out, mask = pad_or_crop_time_dim(x, 5)
+        self.assertEqual(out.shape, (5, 3, 4, 4))
+        self.assertTrue(torch.equal(out, x[:5]))
+        self.assertTrue(mask.all())
+
+    def test_exact_match_rank4_image_sequence(self):
+        x = torch.randn(5, 3, 4, 4)
+        out, mask = pad_or_crop_time_dim(x, 5)
+        self.assertTrue(torch.equal(out, x))
+        self.assertTrue(mask.all())
+
 
 class TestRepeatPad(unittest.TestCase):
     def test_repeats_last_frame(self):

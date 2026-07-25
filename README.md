@@ -47,7 +47,9 @@ it does not reinvent batching.
 OmniLoader is **modality-, dataset- and model-agnostic** — it knows nothing about video,
 audio, text, which specific corpora you loaded, or any model. Everything is described
 structurally as **vectors** (shape `()` or `(F,)`) and **sequences** (shape `(T,)` or
-`(T, F)`); a value is a sequence exactly when its spec sets `time_dim`.
+`(T, F)`); a value is a sequence exactly when its spec sets `time_dim`. A value can also
+be **structured** — e.g. an image `(C, H, W)` — by setting `shape` instead of
+`feature_dim`, yielding `(*shape,)` or, for a sequence, `(T, *shape)`.
 
 Beyond this core unification and its utilities (schema declaration, dataset adapters,
 splits, introspection), OmniLoader also ships the surrounding machinery a joint training
@@ -65,7 +67,7 @@ weights and loss weights), and a mask-aware transform pipeline of **normalizatio
 | **Core** | `OmniLoader` | Concatenates disjoint datasets into one masked, unified stream |
 | | `SampleUnifier` | Maps a raw sample onto the union schema; fills gaps with placeholder + `<name>_mask` |
 | | `unified_collate` | Stacks tensors, lists metadata |
-| **Schema** | `TensorSpec` | Declare a value (feature or target): `feature_dim`, `time_dim`, dtype, placeholder |
+| **Schema** | `TensorSpec` | Declare a value (feature or target): `feature_dim`/`shape`, `time_dim`, dtype, placeholder |
 | | `DatasetSchema` / `UnifiedSchema` | Per-dataset specs; merged + validated union |
 | | vector / sequence | Structural, modality-agnostic (`()`, `(F,)`, `(T,)`, `(T,F)`) |
 | **Datasets** | `HDF5Dataset` | Per-sample HDF5 groups; worker-safe; `cache_size`/`preload` |
@@ -137,22 +139,26 @@ make check   # ruff + ty + tests(+coverage) + docs build (mirrors CI)
 import torch
 from torch.utils.data import DataLoader
 from omniloader import (
-    DatasetSchema, DictTensorDataset, TensorSpec,
-    OmniLoader, TemperatureStrategy, unified_collate,
+    DatasetSchema,
+    DictTensorDataset,
+    TensorSpec,
+    OmniLoader,
+    TemperatureStrategy,
+    unified_collate,
 )
 
 # Dataset A — a per-step (sequence) target over a length-16 feature sequence.
 ds_a = DictTensorDataset({"video": torch.randn(40, 16, 32), "valence": torch.randn(40, 16)})
 schema_a = DatasetSchema(
-    features=[TensorSpec("video", feature_dim=32, time_dim=16)],   # sequence (T, F)
-    targets=[TensorSpec("valence", time_dim=16, placeholder=-5.0)], # sequence (T,)
+    features=[TensorSpec("video", feature_dim=32, time_dim=16)],  # sequence (T, F)
+    targets=[TensorSpec("valence", time_dim=16, placeholder=-5.0)],  # sequence (T,)
 )
 
 # Dataset B — a single scalar target per sample, a different feature sequence.
 ds_b = DictTensorDataset({"audio": torch.randn(200, 24, 8), "sentiment": torch.randn(200)})
 schema_b = DatasetSchema(
     features=[TensorSpec("audio", feature_dim=8, time_dim=24)],  # sequence (T, F)
-    targets=[TensorSpec("sentiment", placeholder=-5.0)],         # vector scalar ()
+    targets=[TensorSpec("sentiment", placeholder=-5.0)],  # vector scalar ()
 )
 
 omni = OmniLoader([ds_a, ds_b], [schema_a, schema_b])
@@ -162,9 +168,9 @@ loader = DataLoader(omni, batch_size=8, sampler=sampler, collate_fn=unified_coll
 batch = next(iter(loader))
 # Every batch carries the union schema: video, audio, valence, sentiment + masks.
 assert batch["valence"].shape == (8, 16)
-assert batch["valence_mask"].shape == (8, 16)   # False for samples from dataset B
+assert batch["valence_mask"].shape == (8, 16)  # False for samples from dataset B
 assert batch["sentiment"].shape == (8,)
-assert batch["sentiment_mask"].shape == (8,)    # False for samples from dataset A
+assert batch["sentiment_mask"].shape == (8,)  # False for samples from dataset A
 ```
 
 > **Single dataset?** OmniLoader works with one dataset too — pass one-element lists.
@@ -187,13 +193,28 @@ is set by whether it goes in `features=` or `targets=`):
 | Field | Meaning |
 |-------|---------|
 | `name` | key in the sample dict |
-| `feature_dim` | trailing feature size `F`, or `None` for a scalar along that axis |
+| `feature_dim` | trailing feature size `F`, or `None` for a scalar along that axis. Sugar for `shape=(F,)` |
+| `shape` | full trailing shape for structured values (e.g. an image `(C, H, W)`); mutually exclusive with `feature_dim` |
 | `time_dim` | sequence length `T`; **set it to make the value a sequence** (padded/cropped to this). `None` → vector |
 | `dtype` | `torch.float32`, `torch.int64`, … (class ids use an int dtype) |
 | `placeholder` | fill value when a dataset lacks the key (e.g. `-1` ignore-index for classes) |
 
-The four representable shapes are `()`, `(F,)`, `(T,)` and `(T, F)`. The mask
-matches the sequence axis: `(T,)` for sequences, scalar `()` for vectors.
+The representable shapes are `()`, `(F,)`, `(T,)`, `(T, F)` and, with `shape` set,
+`(*shape,)` or `(T, *shape)` for a structured (e.g. image-sequence) value:
+
+```python
+TensorSpec(
+    name="eye_image",
+    time_dim=15,  # T
+    shape=(3, 64, 64),  # C, H, W
+    dtype=torch.float32,
+)
+# value_shape == (15, 3, 64, 64); mask_shape == (15,), one flag per frame
+```
+
+The mask matches the sequence axis: `(T,)` for sequences, scalar `()` for vectors —
+a structured sequence is masked exactly like a feature sequence (one flag per time
+step; no per-pixel masking).
 
 ---
 
@@ -215,12 +236,12 @@ you let `OmniLoader` drive it, but you can call it directly to see the shape:
 from omniloader import SampleUnifier, UnifiedSchema
 import torch
 
-schema = UnifiedSchema([schema_a, schema_b])   # merge per-dataset schemas into the union
-unify = SampleUnifier(schema)                  # pads/crops sequences + fills missing keys
+schema = UnifiedSchema([schema_a, schema_b])  # merge per-dataset schemas into the union
+unify = SampleUnifier(schema)  # pads/crops sequences + fills missing keys
 
 unified = unify({"video": torch.randn(16, 32)})  # a raw dict that only has 'video'
 assert set(unified) >= {"video", "audio", "valence", "sentiment"}  # every union key present
-assert not unified["sentiment_mask"]             # absent key -> all-False mask (ignore in loss)
+assert not unified["sentiment_mask"]  # absent key -> all-False mask (ignore in loss)
 ```
 
 `OmniLoader([ds_a, ds_b], [schema_a, schema_b])` applies this across datasets, so a plain
@@ -287,15 +308,21 @@ the mixing weights (a `SubsampleConfig` per dataset):
 
 ```python
 from omniloader import (
-    TemperatureStrategy, SubsampleConfig, ExhaustionPolicy, class_weights_for_sampler,
+    TemperatureStrategy,
+    SubsampleConfig,
+    ExhaustionPolicy,
+    class_weights_for_sampler,
 )
 
 sampler = omni.make_sampler(
     TemperatureStrategy(
-        omni.dataset_sizes, temperature=2.0,                 # size-aware balancing
+        omni.dataset_sizes,
+        temperature=2.0,  # size-aware balancing
         subsample=[
-            SubsampleConfig(policy=ExhaustionPolicy.EXHAUST),                   # A: full coverage
-            SubsampleConfig(sample_weights=class_weights_for_sampler(ds_b, "label")),  # B: class-balanced
+            SubsampleConfig(policy=ExhaustionPolicy.EXHAUST),  # A: full coverage
+            SubsampleConfig(
+                sample_weights=class_weights_for_sampler(ds_b, "label")
+            ),  # B: class-balanced
         ],
     )
 )
@@ -330,8 +357,10 @@ omniloader class-weights-for-loss config.yaml --target emotion -o class_weights_
 import json, torch
 from omniloader import class_weights_for_loss, class_histogram
 
-counts = class_histogram(omni, "emotion")              # exact per-class counts (int64)
-w = class_weights_for_loss(omni, "emotion", scheme="inverse")   # (num_classes,), avg 1, absent class -> 0
+counts = class_histogram(omni, "emotion")  # exact per-class counts (int64)
+w = class_weights_for_loss(
+    omni, "emotion", scheme="inverse"
+)  # (num_classes,), avg 1, absent class -> 0
 loss = torch.nn.CrossEntropyLoss(weight=w)
 
 # later runs: load the saved vector instead of recomputing
@@ -350,7 +379,7 @@ loader's `seed`. Augmentations self-skip during evaluation.
 ```python
 from omniloader import Normalize, GaussianNoise, Compose, compute_stats
 
-stats = compute_stats(omni, keys=["video", "audio"])   # over valid steps
+stats = compute_stats(omni, keys=["video", "audio"])  # over valid steps
 transform = Compose([Normalize(stats), GaussianNoise(std=0.1, p=0.5, schema=omni.schema)])
 omni = OmniLoader([ds_a, ds_b], [schema_a, schema_b], transform=transform, seed=0)
 ```
@@ -368,7 +397,7 @@ omniloader compute-stats config.yaml -o ds_stats.json --per-dataset
 from omniloader import compute_stats, save_stats, load_stats
 
 save_stats(compute_stats(omni, keys=["video", "audio"]), "stats.json")  # persist once
-stats = load_stats("stats.json")                                        # reuse later
+stats = load_stats("stats.json")  # reuse later
 ```
 
 The JSON lives wherever you point it (track it with **DVC** for reproducibility). In a
@@ -394,9 +423,11 @@ from omniloader import compute_dataset_stats, PerDatasetNormalize, Compose
 
 # Per-dataset train stats, keyed by the `dataset` metadata every sample carries.
 ds_stats = compute_dataset_stats(omni, keys=["video", "audio"])
-transform = Compose([
-    PerDatasetNormalize(ds_stats, fallback="instance"),  # unseen source → per-sample norm
-])
+transform = Compose(
+    [
+        PerDatasetNormalize(ds_stats, fallback="instance"),  # unseen source → per-sample norm
+    ]
+)
 ```
 
 **Choosing:** benchmarking within known corpora → per-dataset is best (source id is
@@ -440,8 +471,11 @@ batch pad only to its own longest sample, grouping similar lengths to shrink tha
 ```python
 from torch.utils.data import DataLoader
 from omniloader import (
-    OmniSampler, ProportionalStrategy, DynamicCollator,
-    LengthBucketBatchSampler, seed_worker,
+    OmniSampler,
+    ProportionalStrategy,
+    DynamicCollator,
+    LengthBucketBatchSampler,
+    seed_worker,
 )
 
 omni = OmniLoader([ds_a, ds_b], [schema_a, schema_b], pad_features=False)  # native lengths
@@ -449,16 +483,18 @@ omni = OmniLoader([ds_a, ds_b], [schema_a, schema_b], pad_features=False)  # nat
 sampler = OmniSampler(ProportionalStrategy(omni.dataset_sizes))
 batches = LengthBucketBatchSampler(sampler, omni.sequence_lengths("video"), batch_size=8)
 loader = DataLoader(
-    omni, batch_sampler=batches,
-    collate_fn=DynamicCollator(omni.schema), worker_init_fn=seed_worker,
+    omni,
+    batch_sampler=batches,
+    collate_fn=DynamicCollator(omni.schema),
+    worker_init_fn=seed_worker,
 )
 ```
 
 ### Introspection
 
 ```python
-print(omni.describe())          # coverage matrix, valid fractions, class distributions
-issues = omni.validate()        # [] when every dataset matches its declared specs
+print(omni.describe())  # coverage matrix, valid fractions, class distributions
+issues = omni.validate()  # [] when every dataset matches its declared specs
 ```
 
 ### Config, CLI & Lightning (`OmniConfig`)
@@ -515,7 +551,7 @@ config = OmniConfig.from_file("config.yaml")
 
 # Everything in one call — datasets, strategy, sampler, transforms, collate, bucketing:
 train_loader = config.build_dataloader(training=True)
-val_loader = config.build_dataloader(training=False)   # sequential, augmentations off
+val_loader = config.build_dataloader(training=False)  # sequential, augmentations off
 
 # …or keep the building blocks for manual wiring:
 datasets, schemas = config.build_datasets()

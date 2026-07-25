@@ -136,6 +136,20 @@ class TestSpanMasking(unittest.TestCase):
         with self.assertRaises(ValueError):
             SpanMasking(schema=None)
 
+    def test_zeros_whole_frames_of_image_sequence(self):
+        # (T, C, H, W): masking a timestep must zero the whole frame, not one axis.
+        sample = {
+            "eye_image": torch.ones(6, 3, 4, 4),
+            "eye_image_mask": torch.ones(6, dtype=torch.bool),
+        }
+        tf = SpanMasking(keys=["eye_image"], num_spans=1, span_len=2, p=1.0)
+        out = tf(sample, generator=torch.Generator().manual_seed(0))
+        self.assertEqual(out["eye_image"].shape, (6, 3, 4, 4))
+        zeroed_frames = (out["eye_image"] == 0).all(dim=(1, 2, 3))
+        self.assertTrue(zeroed_frames.any())
+        # Mask stays one flag per timestep, unaffected by the value zeroing.
+        self.assertTrue(out["eye_image_mask"].all())
+
 
 class TestComposeAndBuild(unittest.TestCase):
     def test_compose_applies_in_order(self):
@@ -246,6 +260,22 @@ class TestTimeWarp(unittest.TestCase):
         with self.assertRaises(ValueError):
             TimeWarp()
 
+    def test_rejects_image_sequence_spec_via_schema(self):
+        schema = UnifiedSchema(
+            [DatasetSchema(features=[TensorSpec("eye_image", time_dim=6, shape=(3, 4, 4))])]
+        )
+        with self.assertRaises(ValueError):
+            TimeWarp(schema=schema)
+
+    def test_rejects_image_sequence_value_without_schema(self):
+        sample = {
+            "eye_image": torch.randn(6, 3, 4, 4),
+            "eye_image_mask": torch.ones(6, dtype=torch.bool),
+        }
+        tf = TimeWarp(keys=["eye_image"], p=1.0)
+        with self.assertRaises(ValueError):
+            tf(sample, generator=torch.Generator().manual_seed(0))
+
 
 class TestFeatureMasking(unittest.TestCase):
     def test_zeros_feature_band(self):
@@ -268,6 +298,13 @@ class TestFeatureMasking(unittest.TestCase):
         sample = {"s": torch.tensor(3.0), "s_mask": torch.tensor(True)}
         out = FeatureMasking(keys=["s"], p=1.0)(sample, generator=torch.Generator().manual_seed(0))
         self.assertEqual(float(out["s"]), 3.0)
+
+    def test_rejects_image_sequence_spec_via_schema(self):
+        schema = UnifiedSchema(
+            [DatasetSchema(features=[TensorSpec("eye_image", time_dim=6, shape=(3, 4, 4))])]
+        )
+        with self.assertRaises(ValueError):
+            FeatureMasking(schema=schema)
 
 
 if __name__ == "__main__":

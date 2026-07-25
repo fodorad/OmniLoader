@@ -11,10 +11,16 @@ A dataset entry looks like::
       "adapter": "hdf5",
       "args": {"h5_path": "data/mosei.h5", "subset": "train"},
       "schema": {
-        "features": [{"name": "video", "feature_dim": 1024, "time_dim": 300}],
+        "features": [
+          {"name": "video", "feature_dim": 1024, "time_dim": 300},
+          {"name": "eye_image", "shape": [3, 64, 64], "time_dim": 15}
+        ],
         "targets": [{"name": "sentiment", "placeholder": -5.0}]
       }
     }
+
+``shape`` declares a structured (e.g. image) trailing shape instead of a flat
+feature vector; see :class:`~omniloader.schema.spec.TensorSpec`.
 """
 
 from __future__ import annotations

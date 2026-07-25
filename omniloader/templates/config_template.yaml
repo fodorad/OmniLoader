@@ -14,7 +14,8 @@
 #
 # Shape vocabulary (modality-agnostic): a value is a *vector* (shape () or (F,))
 # or a *sequence* (shape (T,) or (T, F)). It is a sequence exactly when its spec
-# sets `time_dim`.
+# sets `time_dim`. A structured value (e.g. an image) sets `shape` instead of
+# `feature_dim` for a full trailing shape like (C, H, W); see spec 3 below.
 # =============================================================================
 
 
@@ -68,6 +69,10 @@ datasets:
         - name: emotion                # a categorical target
           dtype: int64
           placeholder: -1              # -1 as an ignore_index for CrossEntropyLoss
+        # - name: eye_image            # structured (e.g. image) sequence example:
+        #   shape: [3, 64, 64]         # trailing (C, H, W) shape, in place of feature_dim
+        #   time_dim: 15               # -> value shape (15, 3, 64, 64), mask shape (15,)
+        #   dtype: float32
 
   - adapter: npy                        # memory-mapped root/<sample>/<key>.npy layout
     args:
