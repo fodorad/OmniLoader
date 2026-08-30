@@ -9,6 +9,13 @@ Releases are managed automatically with
 [Conventional Commits](https://www.conventionalcommits.org/). Future entries will
 list the changes relative to the previous release.
 
+## [1.1.1](https://github.com/fodorad/OmniLoader/compare/v1.1.0...v1.1.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* **data:** make HDF5Dataset fork-safe under multi-worker DataLoader ([#12](https://github.com/fodorad/OmniLoader/issues/12)) ([4bc5ed6](https://github.com/fodorad/OmniLoader/commit/4bc5ed69e2f075ab92e13ca32811cc247b966fa7))
+
 ## [1.1.0](https://github.com/fodorad/OmniLoader/compare/v1.0.0...v1.1.0) (2026-07-25)
 
 
