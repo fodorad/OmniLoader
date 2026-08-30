@@ -9,6 +9,7 @@ supplied alongside it to :class:`~omniloader.loader.OmniLoader`.
 
 from __future__ import annotations
 
+import os
 from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -57,8 +58,13 @@ class HDF5Dataset(Dataset):
     The file is expected to hold a group named ``subset`` (e.g. ``"train"``)
     whose children are per-sample groups, each containing the named value
     datasets (features, targets, masks, metadata). The file handle is opened
-    lazily per worker process so the dataset is safe to use with
-    ``num_workers > 0``.
+    lazily on first read so it *can* be per-process, but an HDF5 handle is not
+    fork-safe: if anything reads a sample (or ``preload=True``) before a
+    ``DataLoader`` forks its workers, every worker inherits the same open
+    handle and reads silently hang. Use ``num_workers > 0`` only with
+    :func:`omniloader.utils.seeding.seed_worker` passed as the DataLoader's
+    ``worker_init_fn`` (OmniLoader's own loader/config helpers already do
+    this), which clears the handle so each worker reopens its own.
 
     Args:
         h5_path: Path to the ``.h5`` file.
@@ -88,6 +94,7 @@ class HDF5Dataset(Dataset):
         self.keys = list(keys) if keys is not None else None
         self.cache_size = cache_size
         self._file: h5py.File | None = None
+        self._pid: int | None = None
         self._cache: OrderedDict[int, dict[str, Any]] = OrderedDict()
         with h5py.File(self.h5_path, "r") as f:
             if subset not in f:
@@ -96,11 +103,33 @@ class HDF5Dataset(Dataset):
         self._preloaded: list[dict[str, Any]] | None = (
             [self._read(i) for i in range(len(self.sample_ids))] if preload else None
         )
+        if self._preloaded is not None and self._file is not None:
+            # Every sample is now in memory; the handle preload() opened would
+            # otherwise sit open in the parent process and get inherited by
+            # forked DataLoader workers (see _handle's fork-safety note).
+            self._file.close()
+            self._file = None
+            self._pid = None
 
     def _handle(self) -> h5py.File:
-        """Return a per-process open file handle, opening it on first use."""
+        """Return a per-process open file handle, opening it on first use.
+
+        Raises:
+            RuntimeError: If a handle opened in another process (typically the
+                parent, before a ``fork``-based ``DataLoader`` spawned workers)
+                is read from this one. HDF5 handles are not fork-safe, so this
+                fails loudly instead of hanging or corrupting reads.
+
+        """
+        if self._file is not None and self._pid != os.getpid():
+            raise RuntimeError(
+                f"{self.h5_path} was opened in pid {self._pid} and is being read "
+                f"from pid {os.getpid()}. HDF5 handles are not fork-safe. Pass "
+                "omniloader.seed_worker as the DataLoader's worker_init_fn."
+            )
         if self._file is None:
             self._file = h5py.File(self.h5_path, "r")
+            self._pid = os.getpid()
         return self._file
 
     def _read(self, index: int) -> dict[str, Any]:
@@ -140,8 +169,21 @@ class HDF5Dataset(Dataset):
         """Drop the open file handle and cache when pickling (for workers)."""
         state = self.__dict__.copy()
         state["_file"] = None
+        state["_pid"] = None
         state["_cache"] = OrderedDict()
         return state
+
+    def reset_for_worker(self) -> None:
+        """Drop any inherited file handle and cache so this process reopens its own.
+
+        Called by :func:`omniloader.utils.seeding.seed_worker` (the DataLoader's
+        ``worker_init_fn``) inside each worker, since a ``fork``-started worker
+        inherits the parent's already-open (and not fork-safe) handle directly
+        without going through :meth:`__getstate__`.
+        """
+        self._file = None
+        self._pid = None
+        self._cache.clear()
 
 
 class DictTensorDataset(Dataset):
