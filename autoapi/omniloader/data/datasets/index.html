@@ -319,8 +319,13 @@ supplied alongside it to <a class="reference internal" href="../../loader/index.
 <p>The file is expected to hold a group named <code class="docutils literal notranslate"><span class="pre">subset</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;train&quot;</span></code>)
 whose children are per-sample groups, each containing the named value
 datasets (features, targets, masks, metadata). The file handle is opened
-lazily per worker process so the dataset is safe to use with
-<code class="docutils literal notranslate"><span class="pre">num_workers</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.</p>
+lazily on first read so it <em>can</em> be per-process, but an HDF5 handle is not
+fork-safe: if anything reads a sample (or <code class="docutils literal notranslate"><span class="pre">preload=True</span></code>) before a
+<code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> forks its workers, every worker inherits the same open
+handle and reads silently hang. Use <code class="docutils literal notranslate"><span class="pre">num_workers</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> only with
+<a class="reference internal" href="../../utils/seeding/index.html#omniloader.utils.seeding.seed_worker" title="omniloader.utils.seeding.seed_worker"><code class="xref py py-func docutils literal notranslate"><span class="pre">omniloader.utils.seeding.seed_worker()</span></code></a> passed as the DataLoader’s
+<code class="docutils literal notranslate"><span class="pre">worker_init_fn</span></code> (OmniLoader’s own loader/config helpers already do
+this), which clears the handle so each worker reopens its own.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -362,6 +367,16 @@ for small datasets; uses the most memory).</p></li>
 <dt class="sig sig-object py" id="omniloader.data.datasets.HDF5Dataset.__getstate__">
 <span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/omniloader/data/datasets.html#HDF5Dataset.__getstate__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omniloader.data.datasets.HDF5Dataset.__getstate__" title="Link to this definition">¶</a></dt>
 <dd><p>Drop the open file handle and cache when pickling (for workers).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omniloader.data.datasets.HDF5Dataset.reset_for_worker">
+<span class="sig-name descname"><span class="pre">reset_for_worker</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../../../_modules/omniloader/data/datasets.html#HDF5Dataset.reset_for_worker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omniloader.data.datasets.HDF5Dataset.reset_for_worker" title="Link to this definition">¶</a></dt>
+<dd><p>Drop any inherited file handle and cache so this process reopens its own.</p>
+<p>Called by <a class="reference internal" href="../../utils/seeding/index.html#omniloader.utils.seeding.seed_worker" title="omniloader.utils.seeding.seed_worker"><code class="xref py py-func docutils literal notranslate"><span class="pre">omniloader.utils.seeding.seed_worker()</span></code></a> (the DataLoader’s
+<code class="docutils literal notranslate"><span class="pre">worker_init_fn</span></code>) inside each worker, since a <code class="docutils literal notranslate"><span class="pre">fork</span></code>-started worker
+inherits the parent’s already-open (and not fork-safe) handle directly
+without going through <a class="reference internal" href="#omniloader.data.datasets.HDF5Dataset.__getstate__" title="omniloader.data.datasets.HDF5Dataset.__getstate__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__getstate__()</span></code></a>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -474,6 +489,7 @@ per-sample slice of every tensor as a dict.</p>
 <li><a class="reference internal" href="#omniloader.data.datasets.HDF5Dataset.__len__"><code class="docutils literal notranslate"><span class="pre">HDF5Dataset.__len__()</span></code></a></li>
 <li><a class="reference internal" href="#omniloader.data.datasets.HDF5Dataset.__getitem__"><code class="docutils literal notranslate"><span class="pre">HDF5Dataset.__getitem__()</span></code></a></li>
 <li><a class="reference internal" href="#omniloader.data.datasets.HDF5Dataset.__getstate__"><code class="docutils literal notranslate"><span class="pre">HDF5Dataset.__getstate__()</span></code></a></li>
+<li><a class="reference internal" href="#omniloader.data.datasets.HDF5Dataset.reset_for_worker"><code class="docutils literal notranslate"><span class="pre">HDF5Dataset.reset_for_worker()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#omniloader.data.datasets.DictTensorDataset"><code class="docutils literal notranslate"><span class="pre">DictTensorDataset</span></code></a><ul>

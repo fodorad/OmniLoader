@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.base</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Transform base classes and shared helpers.</span>
+<span></span><span class="sd">"""Transform base classes and shared helpers.</span>
 
 <span class="sd">A :class:`Transform` operates on an already-unified sample dict (the output of</span>
 <span class="sd">:class:`~omniloader.schema.unify.SampleUnifier`) and is modality-agnostic — it</span>
@@ -293,7 +293,7 @@
 <span class="sd">  and placeholders are left untouched);</span>
 <span class="sd">* **train/eval-aware** — augmentations set ``train_only = True`` so they are</span>
 <span class="sd">  skipped during evaluation, while normalization runs in both phases.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -312,20 +312,20 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a single uniform ``[0, 1)`` scalar, optionally from a generator.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Draw a single uniform ``[0, 1)`` scalar, optionally from a generator."""</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((),</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="Transform">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.Transform">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Transform</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for per-sample transforms.</span>
+<span class="w">    </span><span class="sd">"""Base class for per-sample transforms.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        train_only: When ``True`` the transform is skipped unless ``training``</span>
 <span class="sd">            is passed as ``True`` to :meth:`__call__`.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -338,7 +338,7 @@
         <span class="n">training</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the transform, honouring the train/eval gate.</span>
+<span class="w">        </span><span class="sd">"""Apply the transform, honouring the train/eval gate.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            sample: The unified sample dict to transform.</span>
@@ -348,7 +348,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            The transformed sample (mutated in place and returned).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_only</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">training</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">)</span></div>
@@ -358,7 +358,7 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.Transform.apply">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform ``sample`` unconditionally. Subclasses implement this.&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">"""Transform ``sample`` unconditionally. Subclasses implement this."""</span></div>
 </div>
 
 
@@ -366,12 +366,12 @@
 <div class="viewcode-block" id="Compose">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.Compose">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Compose</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a list of transforms in order.</span>
+<span class="w">    </span><span class="sd">"""Apply a list of transforms in order.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        transforms: The transforms to apply sequentially.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transforms</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transform</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span>
@@ -385,7 +385,7 @@
         <span class="n">training</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply each contained transform in order (each honours its own gate).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Apply each contained transform in order (each honours its own gate)."""</span>
         <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
             <span class="n">sample</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">training</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
@@ -394,7 +394,7 @@
 <div class="viewcode-block" id="Compose.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.Compose.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply every contained transform (train gate handled per-transform).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Apply every contained transform (train gate handled per-transform)."""</span>
         <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
             <span class="n">sample</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
@@ -405,7 +405,7 @@
 <div class="viewcode-block" id="broadcast_mask">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.broadcast_mask">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Broadcast a validity mask to the value&#39;s shape for ``torch.where``.</span>
+<span class="w">    </span><span class="sd">"""Broadcast a validity mask to the value's shape for ``torch.where``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        mask: Mask of shape ``()`` (vector) or ``(T,)`` (sequence).</span>
@@ -414,7 +414,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A boolean tensor broadcastable to ``value.shape``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
         <span class="c1"># Sequence value (T, F) with a (T,) mask -&gt; add trailing feature axis.</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
@@ -425,11 +425,11 @@
 <div class="viewcode-block" id="resolve_keys">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.resolve_keys">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">resolve_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return explicit ``keys`` or all feature keys from ``schema``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return explicit ``keys`` or all feature keys from ``schema``."""</span>
     <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either keys or a schema must be provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Either keys or a schema must be provided"</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">feature_keys</span><span class="p">)</span></div>
 
 
@@ -437,11 +437,11 @@
 <div class="viewcode-block" id="resolve_sequence_keys">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/base/index.html#omniloader.transforms.base.resolve_sequence_keys">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">resolve_sequence_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return explicit ``keys`` or all sequence feature keys from ``schema``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return explicit ``keys`` or all sequence feature keys from ``schema``."""</span>
     <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either keys or a schema must be provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Either keys or a schema must be provided"</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">features</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">is_sequence</span><span class="p">]</span></div>
 
 </pre></div>

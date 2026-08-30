@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.mix</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;MixUp / CutMix as a collate-time wrapper.</span>
+<span></span><span class="sd">"""MixUp / CutMix as a collate-time wrapper.</span>
 
 <span class="sd">Cross-sample mixing must happen at the batch level, so this is a *collator* that</span>
 <span class="sd">wraps a base collate function rather than a per-sample :class:`Transform`. It mixes</span>
@@ -289,10 +289,10 @@
 <span class="sd">mixing coefficient ``mixup_lambda`` and the permutation ``mixup_index``. No loss</span>
 <span class="sd">logic lives here, keeping the library strictly data-side.</span>
 
-<span class="sd">* ``mode=&quot;mixup&quot;`` — convex blend ``lam * x + (1 - lam) * x[perm]``.</span>
-<span class="sd">* ``mode=&quot;cutmix&quot;`` — replace a contiguous time span of each sequence with the</span>
-<span class="sd">  permuted sample&#39;s span; ``mixup_lambda`` is the retained fraction.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">* ``mode="mixup"`` — convex blend ``lam * x + (1 - lam) * x[perm]``.</span>
+<span class="sd">* ``mode="cutmix"`` — replace a contiguous time span of each sequence with the</span>
+<span class="sd">  permuted sample's span; ``mixup_lambda`` is the retained fraction.</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -310,7 +310,7 @@
 <div class="viewcode-block" id="MixupCollator">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/mix/index.html#omniloader.transforms.mix.MixupCollator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MixupCollator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap a base collator to apply MixUp/CutMix to feature tensors.</span>
+<span class="w">    </span><span class="sd">"""Wrap a base collator to apply MixUp/CutMix to feature tensors.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        base_collate: The collator producing the batched dict (e.g.</span>
@@ -318,26 +318,26 @@
 <span class="sd">            :class:`~omniloader.collate.DynamicCollator`).</span>
 <span class="sd">        schema: The unified schema, used to pick feature/target keys.</span>
 <span class="sd">        alpha: Beta distribution parameter; ``lam ~ Beta(alpha, alpha)``.</span>
-<span class="sd">        mode: ``&quot;mixup&quot;`` (blend) or ``&quot;cutmix&quot;`` (span replacement).</span>
+<span class="sd">        mode: ``"mixup"`` (blend) or ``"cutmix"`` (span replacement).</span>
 <span class="sd">        p: Per-batch probability of applying mixing (otherwise passthrough).</span>
 <span class="sd">        seed: Seed for the internal NumPy RNG (deterministic across the run).</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If ``mode`` is not ``&quot;mixup&quot;`` or ``&quot;cutmix&quot;``.</span>
+<span class="sd">        ValueError: If ``mode`` is not ``"mixup"`` or ``"cutmix"``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_collate</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span><span class="p">,</span>
         <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mixup&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mixup"</span><span class="p">,</span>
         <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;mixup&quot;</span><span class="p">,</span> <span class="s2">&quot;cutmix&quot;</span><span class="p">}:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode must be &#39;mixup&#39; or &#39;cutmix&#39;, got </span><span class="si">{</span><span class="n">mode</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"mixup"</span><span class="p">,</span> <span class="s2">"cutmix"</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"mode must be 'mixup' or 'cutmix', got </span><span class="si">{</span><span class="n">mode</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">base_collate</span> <span class="o">=</span> <span class="n">base_collate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">feature_keys</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">target_keys</span><span class="p">)</span>
@@ -350,16 +350,16 @@
 <div class="viewcode-block" id="MixupCollator.__call__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/mix/index.html#omniloader.transforms.mix.MixupCollator.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Collate then mix; adds ``mixup_lambda``, ``mixup_index`` and ``&lt;t&gt;_b``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Collate then mix; adds ``mixup_lambda``, ``mixup_index`` and ``&lt;t&gt;_b``."""</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_collate</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
             <span class="c1"># Passthrough with identity metadata so downstream code is uniform.</span>
-            <span class="n">out</span><span class="p">[</span><span class="s2">&quot;mixup_lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">out</span><span class="p">[</span><span class="s2">&quot;mixup_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="s2">"mixup_lambda"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">out</span><span class="p">[</span><span class="s2">"mixup_index"</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_keys</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_b"</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">out</span>
 
         <span class="n">perm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
@@ -370,29 +370,29 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_keys</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">other</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">perm</span><span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mixup&quot;</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_features</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">"mixup"</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq_features</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">lam</span> <span class="o">*</span> <span class="n">value</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">lam</span><span class="p">)</span> <span class="o">*</span> <span class="n">other</span>  <span class="c1"># (B, ...) convex blend</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># cutmix: splice a shared time span from the permuted batch</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cut_span</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">rel_start</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">perm</span><span class="p">]</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;mixup_lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lam</span>
-        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;mixup_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm</span>
+                <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_b"</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">perm</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"mixup_lambda"</span><span class="p">]</span> <span class="o">=</span> <span class="n">lam</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"mixup_index"</span><span class="p">]</span> <span class="o">=</span> <span class="n">perm</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_cut_span</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rel_start</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Replace a ``(1 - keep)`` time span of ``value`` with ``other`` in place.</span>
+<span class="w">        </span><span class="sd">"""Replace a ``(1 - keep)`` time span of ``value`` with ``other`` in place.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value: Batched sequence feature ``(B, T, ...)``.</span>
 <span class="sd">            other: The permuted batch to splice in.</span>
-<span class="sd">            keep: Fraction of ``value`` to retain (the batch&#39;s ``mixup_lambda``).</span>
+<span class="sd">            keep: Fraction of ``value`` to retain (the batch's ``mixup_lambda``).</span>
 <span class="sd">            rel_start: Relative start of the cut window in ``[0, 1)``.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">length</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">cut</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">keep</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rel_start</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">-</span> <span class="n">cut</span><span class="p">))</span>

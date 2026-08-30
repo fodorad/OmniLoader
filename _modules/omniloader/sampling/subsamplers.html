@@ -280,21 +280,21 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.sampling.subsamplers</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Per-dataset index draws with configurable reuse and exhaustion policies.</span>
+<span></span><span class="sd">"""Per-dataset index draws with configurable reuse and exhaustion policies.</span>
 
 <span class="sd">An :class:`IndexPool` produces the local indices to visit within a single</span>
 <span class="sd">dataset for a given epoch. It captures three orthogonal choices:</span>
 
 <span class="sd">* **replacement** — whether a draw may repeat an index within one epoch;</span>
 <span class="sd">* **exhaustion policy** — for without-replacement draws, whether each epoch is a</span>
-<span class="sd">  fresh random subsample (``&quot;fresh&quot;``) or whether the pool shuffles through the</span>
-<span class="sd">  entire dataset before any index is reused across epochs (``&quot;exhaust&quot;``);</span>
+<span class="sd">  fresh random subsample (``"fresh"``) or whether the pool shuffles through the</span>
+<span class="sd">  entire dataset before any index is reused across epochs (``"exhaust"``);</span>
 <span class="sd">* **weights** — optional per-index weights for skewed sampling (e.g. class</span>
 <span class="sd">  balancing within a dataset).</span>
 
 <span class="sd">Draws are fully determined by a base ``seed`` and the epoch number, so runs are</span>
 <span class="sd">reproducible.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -310,7 +310,7 @@
 <div class="viewcode-block" id="ExhaustionPolicy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/subsamplers/index.html#omniloader.sampling.subsamplers.ExhaustionPolicy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExhaustionPolicy</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;How without-replacement draws relate across epochs.</span>
+<span class="w">    </span><span class="sd">"""How without-replacement draws relate across epochs.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        FRESH: Every epoch independently samples without replacement from the</span>
@@ -319,17 +319,17 @@
 <span class="sd">            consume it across epochs, reshuffling only once every index has been</span>
 <span class="sd">            used. This guarantees uniform coverage before any reuse.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">FRESH</span> <span class="o">=</span> <span class="s2">&quot;fresh&quot;</span>
-    <span class="n">EXHAUST</span> <span class="o">=</span> <span class="s2">&quot;exhaust&quot;</span></div>
+    <span class="n">FRESH</span> <span class="o">=</span> <span class="s2">"fresh"</span>
+    <span class="n">EXHAUST</span> <span class="o">=</span> <span class="s2">"exhaust"</span></div>
 
 
 
 <div class="viewcode-block" id="IndexPool">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/subsamplers/index.html#omniloader.sampling.subsamplers.IndexPool">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">IndexPool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw local indices for one dataset, honouring reuse and exhaustion policy.</span>
+<span class="w">    </span><span class="sd">"""Draw local indices for one dataset, honouring reuse and exhaustion policy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        size: Number of samples in the dataset.</span>
@@ -344,7 +344,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``size`` is not positive or ``weights`` has a bad length.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -355,9 +355,9 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IndexPool size must be positive, got </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"IndexPool size must be positive, got </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">size</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weights must have length </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"weights must have length </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">replacement</span> <span class="o">=</span> <span class="n">replacement</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span>
@@ -369,7 +369,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_reshuffles</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a deterministic generator for an epoch.</span>
+<span class="w">        </span><span class="sd">"""Build a deterministic generator for an epoch.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The epoch number.</span>
@@ -378,7 +378,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A seeded :class:`torch.Generator`.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span>
         <span class="n">gen</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">+</span> <span class="n">epoch</span> <span class="o">*</span> <span class="mi">1_000_003</span> <span class="o">+</span> <span class="n">salt</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gen</span>
@@ -386,7 +386,7 @@
 <div class="viewcode-block" id="IndexPool.draw">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/subsamplers/index.html#omniloader.sampling.subsamplers.IndexPool.draw">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ``count`` local indices to visit this epoch.</span>
+<span class="w">        </span><span class="sd">"""Return ``count`` local indices to visit this epoch.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            count: Number of indices requested. May exceed ``size`` when</span>
@@ -397,7 +397,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of ``count`` indices in ``[0, size)``.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
 

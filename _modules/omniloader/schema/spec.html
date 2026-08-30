@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.schema.spec</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Declarative schema for features and targets across heterogeneous datasets.</span>
+<span></span><span class="sd">"""Declarative schema for features and targets across heterogeneous datasets.</span>
 
 <span class="sd">The building blocks here let each dataset declare *what* it provides (features and</span>
 <span class="sd">targets, their shapes, dtypes and placeholder values) without committing to *how*</span>
@@ -296,7 +296,7 @@
 <span class="sd">:class:`UnifiedSchema` merges the per-dataset declarations into the single union</span>
 <span class="sd">schema that :class:`~omniloader.schema.unify.SampleUnifier` uses to bring every raw</span>
 <span class="sd">sample into a common, masked format.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -306,23 +306,23 @@
 
 <span class="c1">#: Mapping of human-readable dtype names to :class:`torch.dtype` values.</span>
 <span class="n">_DTYPES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;float32&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-    <span class="s2">&quot;float64&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-    <span class="s2">&quot;float16&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
-    <span class="s2">&quot;int64&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
-    <span class="s2">&quot;int32&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-    <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span>
+    <span class="s2">"float32"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+    <span class="s2">"float64"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+    <span class="s2">"float16"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+    <span class="s2">"int64"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="s2">"int32"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+    <span class="s2">"bool"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="resolve_dtype">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.resolve_dtype">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">resolve_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dtype given as a string or :class:`torch.dtype`.</span>
+<span class="w">    </span><span class="sd">"""Resolve a dtype given as a string or :class:`torch.dtype`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dtype: Either a :class:`torch.dtype` or one of the string keys in</span>
-<span class="sd">            :data:`_DTYPES` (e.g. ``&quot;float32&quot;``).</span>
+<span class="sd">            :data:`_DTYPES` (e.g. ``"float32"``).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The corresponding :class:`torch.dtype`.</span>
@@ -330,11 +330,11 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``dtype`` is a string that is not a known dtype name.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">dtype</span>
     <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_DTYPES</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown dtype </span><span class="si">{</span><span class="n">dtype</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_DTYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown dtype </span><span class="si">{</span><span class="n">dtype</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_DTYPES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_DTYPES</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span></div>
 
 
@@ -343,7 +343,7 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.TensorSpec">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TensorSpec</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Structural declaration of a single named value (a feature *or* a target).</span>
+<span class="w">    </span><span class="sd">"""Structural declaration of a single named value (a feature *or* a target).</span>
 
 <span class="sd">    The same spec type describes both inputs and supervision targets; its role is</span>
 <span class="sd">    determined by whether it is placed in :attr:`DatasetSchema.features` or</span>
@@ -366,7 +366,7 @@
 <span class="sd">    feature sequences, and structured (e.g. image) sequences::</span>
 
 <span class="sd">        TensorSpec(</span>
-<span class="sd">            name=&quot;eye_image&quot;,</span>
+<span class="sd">            name="eye_image",</span>
 <span class="sd">            time_dim=15,           # T</span>
 <span class="sd">            shape=(3, 64, 64),     # C, H, W</span>
 <span class="sd">            dtype=torch.float32,</span>
@@ -387,7 +387,7 @@
 <span class="sd">        placeholder: Fill value used when a dataset does not provide this key.</span>
 <span class="sd">            Defaults to ``0`` (use e.g. ``-1`` as an ignore index for class ids).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">feature_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -399,36 +399,36 @@
 <div class="viewcode-block" id="TensorSpec.__post_init__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.TensorSpec.__post_init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate and normalise field values.&quot;&quot;&quot;</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="n">resolve_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+<span class="w">        </span><span class="sd">"""Validate and normalise field values."""</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"dtype"</span><span class="p">,</span> <span class="n">resolve_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> cannot set both feature_dim and shape; &quot;</span>
-                <span class="s2">&quot;feature_dim is sugar for shape=(F,)&quot;</span>
+                <span class="sa">f</span><span class="s2">"Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> cannot set both feature_dim and shape; "</span>
+                <span class="s2">"feature_dim is sugar for shape=(F,)"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> feature_dim must be positive&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> feature_dim must be positive"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">dim</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> shape dims must all be positive&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> shape dims must all be positive"</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> time_dim must be positive&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Spec </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> time_dim must be positive"</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the value has a sequence axis (``time_dim`` is set).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Whether the value has a sequence axis (``time_dim`` is set)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">trailing_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The non-time trailing shape, from ``shape`` or ``feature_dim``.</span>
+<span class="w">        </span><span class="sd">"""The non-time trailing shape, from ``shape`` or ``feature_dim``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            ``self.shape`` if set, else ``(feature_dim,)`` if set, else ``()``.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -437,13 +437,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shape of the placeholder value tensor for a single sample.</span>
+<span class="w">        </span><span class="sd">"""Shape of the placeholder value tensor for a single sample.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            ``trailing_shape``, prefixed with ``time_dim`` when the spec is a</span>
 <span class="sd">            sequence.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span><span class="p">)</span>
@@ -452,26 +452,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mask_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shape of the boolean validity mask for a single sample.</span>
+<span class="w">        </span><span class="sd">"""Shape of the boolean validity mask for a single sample.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            ``(T,)`` for a sequence value (one flag per step) and ``()`` for a</span>
 <span class="sd">            vector value (one flag for the whole value).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span><span class="p">,)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">()</span>
 
 <div class="viewcode-block" id="TensorSpec.placeholder_value">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.TensorSpec.placeholder_value">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">placeholder_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the placeholder value tensor filled with :attr:`placeholder`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Build the placeholder value tensor filled with :attr:`placeholder`."""</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">placeholder</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TensorSpec.placeholder_mask">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.TensorSpec.placeholder_mask">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">placeholder_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the all-``False`` mask marking every position as invalid.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Build the all-``False`` mask marking every position as invalid."""</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span></div>
 </div>
 
@@ -481,7 +481,7 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.DatasetSchema">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DatasetSchema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The set of features and targets a single dataset provides.</span>
+<span class="w">    </span><span class="sd">"""The set of features and targets a single dataset provides.</span>
 
 <span class="sd">    A value is a *feature* or a *target* purely by which list it is placed in;</span>
 <span class="sd">    both use the same :class:`TensorSpec`.</span>
@@ -490,34 +490,34 @@
 <span class="sd">        features: Input feature specs the dataset supplies.</span>
 <span class="sd">        targets: Supervision target specs the dataset supplies.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">features</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;All feature and target specs concatenated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""All feature and target specs concatenated."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of every feature and target the dataset provides.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Names of every feature and target the dataset provides."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">specs</span><span class="p">}</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_merge_specs</span><span class="p">(</span><span class="n">specs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">],</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that specs sharing a name are mutually compatible.</span>
+<span class="w">    </span><span class="sd">"""Validate that specs sharing a name are mutually compatible.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        specs: Specs collected across datasets for a single ``kind``.</span>
-<span class="sd">        kind: Human-readable label (``&quot;feature&quot;`` or ``&quot;target&quot;``) for errors.</span>
+<span class="sd">        kind: Human-readable label (``"feature"`` or ``"target"``) for errors.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If two specs share a name but disagree on shape or dtype.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">seen</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TensorSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
         <span class="n">existing</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -525,13 +525,13 @@
             <span class="n">seen</span><span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">existing</span><span class="o">.</span><span class="n">value_shape</span> <span class="o">!=</span> <span class="n">spec</span><span class="o">.</span><span class="n">value_shape</span> <span class="ow">or</span> <span class="n">existing</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">spec</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incompatible </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> spec </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">existing</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Incompatible </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> spec </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">existing</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="UnifiedSchema">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.UnifiedSchema">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UnifiedSchema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Union of several :class:`DatasetSchema` objects into one shared schema.</span>
+<span class="w">    </span><span class="sd">"""Union of several :class:`DatasetSchema` objects into one shared schema.</span>
 
 <span class="sd">    The unified schema is the deduplicated union of every feature and target</span>
 <span class="sd">    across the input datasets. Specs that share a name must agree on shape and</span>
@@ -541,7 +541,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        schemas: Per-dataset schemas to merge.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetSchema</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">features</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -556,35 +556,35 @@
                 <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
                     <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
                     <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">_merge_specs</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">sch</span> <span class="ow">in</span> <span class="n">schemas</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sch</span><span class="o">.</span><span class="n">features</span><span class="p">],</span> <span class="s2">&quot;feature&quot;</span><span class="p">)</span>
-        <span class="n">_merge_specs</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">sch</span> <span class="ow">in</span> <span class="n">schemas</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sch</span><span class="o">.</span><span class="n">targets</span><span class="p">],</span> <span class="s2">&quot;target&quot;</span><span class="p">)</span>
+        <span class="n">_merge_specs</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">sch</span> <span class="ow">in</span> <span class="n">schemas</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sch</span><span class="o">.</span><span class="n">features</span><span class="p">],</span> <span class="s2">"feature"</span><span class="p">)</span>
+        <span class="n">_merge_specs</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">sch</span> <span class="ow">in</span> <span class="n">schemas</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sch</span><span class="o">.</span><span class="n">targets</span><span class="p">],</span> <span class="s2">"target"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;All feature and target specs in the unified schema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""All feature and target specs in the unified schema."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">feature_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of the input features in schema order.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Names of the input features in schema order."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of the supervision targets in schema order.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Names of the supervision targets in schema order."""</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Names of every feature and target in the unified schema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Names of every feature and target in the unified schema."""</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">specs</span><span class="p">}</span>
 
 <div class="viewcode-block" id="UnifiedSchema.spec">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.UnifiedSchema.spec">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TensorSpec</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the spec registered under ``name``.</span>
+<span class="w">        </span><span class="sd">"""Return the spec registered under ``name``.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: Feature or target name.</span>
@@ -595,7 +595,7 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            KeyError: If no spec with that name exists.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">specs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">spec</span>
@@ -605,7 +605,7 @@
 <div class="viewcode-block" id="UnifiedSchema.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/spec/index.html#omniloader.schema.spec.UnifiedSchema.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of features plus targets in the unified schema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of features plus targets in the unified schema."""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span></div>
 </div>
 

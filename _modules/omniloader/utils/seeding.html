@@ -280,39 +280,87 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.utils.seeding</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Worker seeding helpers for reproducible data loading.</span>
+<span></span><span class="sd">"""Worker seeding helpers for reproducible data loading.</span>
 
 <span class="sd">:func:`seed_worker` is a ``DataLoader(worker_init_fn=...)`` callback that gives</span>
-<span class="sd">each worker process a deterministic, distinct RNG state derived from PyTorch&#39;s</span>
+<span class="sd">each worker process a deterministic, distinct RNG state derived from PyTorch's</span>
 <span class="sd">per-worker seed, so any randomness that falls back to the global NumPy/Python/torch</span>
-<span class="sd">RNGs (rather than an explicit :class:`torch.Generator`) is reproducible.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">RNGs (rather than an explicit :class:`torch.Generator`) is reproducible. It also</span>
+<span class="sd">resets any HDF5-backed dataset reachable from the worker's dataset, since HDF5</span>
+<span class="sd">handles are not fork-safe (see :meth:`omniloader.data.datasets.HDF5Dataset.reset_for_worker`).</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_resettable_datasets</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Return every dataset reachable from ``dataset`` that defines ``reset_for_worker``.</span>
+
+<span class="sd">    Walks ``OmniLoader``-style composition (a ``datasets`` sequence of source</span>
+<span class="sd">    datasets) as well as plain ``torch.utils.data.Subset``/``ConcatDataset``</span>
+<span class="sd">    (``dataset``/``datasets`` attributes), so a worker can reset every leaf</span>
+<span class="sd">    dataset regardless of how many layers of wrapping sit above it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: The dataset instance handed to the worker (``get_worker_info().dataset``).</span>
+<span class="sd">        seen: Internal set of already-visited object ids, to guard against cycles.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The list of leaf datasets that expose a ``reset_for_worker`` method.</span>
+
+<span class="sd">    """</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="k">if</span> <span class="n">seen</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">seen</span>
+    <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataset</span><span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">"reset_for_worker"</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"datasets"</span><span class="p">,</span> <span class="s2">"dataset"</span><span class="p">):</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">child</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">child</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">child</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="n">found</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_resettable_datasets</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">seen</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">found</span>
+
+
 <div class="viewcode-block" id="seed_worker">
 <a class="viewcode-back" href="../../../autoapi/omniloader/utils/seeding/index.html#omniloader.utils.seeding.seed_worker">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">seed_worker</span><span class="p">(</span><span class="n">worker_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: ARG001 (DataLoader worker_init_fn API)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Seed a DataLoader worker&#39;s Python, NumPy and torch RNGs deterministically.</span>
+<span class="w">    </span><span class="sd">"""Seed a DataLoader worker's RNGs and give it its own HDF5 handles.</span>
 
 <span class="sd">    Pass as ``DataLoader(worker_init_fn=seed_worker)``. PyTorch already sets a</span>
 <span class="sd">    distinct ``torch.initial_seed()`` per worker (derived from the base seed and</span>
 <span class="sd">    worker id); this propagates it to the other RNGs.</span>
 
+<span class="sd">    A ``fork``-started worker (the default on Linux/macOS) also inherits</span>
+<span class="sd">    whatever HDF5 file handles were already open in the parent process, and</span>
+<span class="sd">    those handles are not fork-safe — reading them from more than one process</span>
+<span class="sd">    hangs rather than raising. This clears any such handle so the lazy reopen</span>
+<span class="sd">    happens inside the worker, as intended by</span>
+<span class="sd">    :meth:`omniloader.data.datasets.HDF5Dataset._handle`.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        worker_id: The worker index supplied by the DataLoader (unused; the seed</span>
 <span class="sd">            is taken from ``torch.initial_seed`` which already encodes it).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">worker_seed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">initial_seed</span><span class="p">()</span> <span class="o">%</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">worker_seed</span><span class="p">)</span>
-    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">worker_seed</span><span class="p">)</span></div>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">worker_seed</span><span class="p">)</span>
+
+    <span class="n">info</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">_resettable_datasets</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">dataset</span><span class="p">):</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">reset_for_worker</span><span class="p">()</span></div>
 
 </pre></div>
         </article>

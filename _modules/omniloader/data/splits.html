@@ -280,13 +280,13 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.data.splits</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Reproducible train/val/test index splitting.</span>
+<span></span><span class="sd">"""Reproducible train/val/test index splitting.</span>
 
 <span class="sd">:func:`split_indices` partitions ``range(n)`` into named splits by ratio, with an</span>
 <span class="sd">optional stratification label so each split preserves the class proportions.</span>
 <span class="sd">:func:`save_split_info` / :func:`load_split_info` persist the result (plus the</span>
 <span class="sd">seed and ratios) so the exact split can be reused across runs.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -300,13 +300,13 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="c1">#: Default split names, matching the HDF5/dataset subset convention.</span>
-<span class="n">DEFAULT_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+<span class="n">DEFAULT_NAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_partition</span><span class="p">(</span>
     <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">ratios</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cut an ordered index list into named chunks by (normalized) ratio.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Cut an ordered index list into named chunks by (normalized) ratio."""</span>
     <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span>
     <span class="n">splits</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
@@ -327,7 +327,7 @@
     <span class="n">stratify</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_NAMES</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Partition ``range(n)`` into named, reproducible splits.</span>
+<span class="w">    </span><span class="sd">"""Partition ``range(n)`` into named, reproducible splits.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n: Number of samples to split.</span>
@@ -345,9 +345,9 @@
 <span class="sd">        ValueError: If ``ratios``/``names`` mismatch or ``stratify`` has the</span>
 <span class="sd">            wrong length.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ratios and names must have the same length&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ratios and names must have the same length"</span><span class="p">)</span>
     <span class="n">gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">stratify</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -355,7 +355,7 @@
         <span class="n">splits</span> <span class="o">=</span> <span class="n">_partition</span><span class="p">(</span><span class="n">shuffled</span><span class="p">,</span> <span class="n">ratios</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stratify</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stratify must have length </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stratify</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"stratify must have length </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stratify</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">groups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stratify</span><span class="p">):</span>
             <span class="n">groups</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
@@ -376,27 +376,27 @@
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
     <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save splits (and optional metadata like seed/ratios) to JSON.</span>
+<span class="w">    </span><span class="sd">"""Save splits (and optional metadata like seed/ratios) to JSON.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        splits: The split mapping from :func:`split_indices`.</span>
 <span class="sd">        path: Destination ``.json`` file.</span>
-<span class="sd">        meta: Optional extra fields (e.g. ``{&quot;seed&quot;: 0, &quot;ratios&quot;: [...]}``).</span>
+<span class="sd">        meta: Optional extra fields (e.g. ``{"seed": 0, "ratios": [...]}``).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;splits&quot;</span><span class="p">:</span> <span class="n">splits</span><span class="p">,</span>
-        <span class="s2">&quot;counts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">splits</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="s2">"splits"</span><span class="p">:</span> <span class="n">splits</span><span class="p">,</span>
+        <span class="s2">"counts"</span><span class="p">:</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">splits</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
         <span class="o">**</span><span class="p">(</span><span class="n">meta</span> <span class="ow">or</span> <span class="p">{}),</span>
     <span class="p">}</span>
-    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="load_split_info">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/splits/index.html#omniloader.data.splits.load_split_info">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_split_info</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the ``splits`` mapping saved by :func:`save_split_info`.</span>
+<span class="w">    </span><span class="sd">"""Load the ``splits`` mapping saved by :func:`save_split_info`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: Path to a JSON file written by :func:`save_split_info`.</span>
@@ -404,9 +404,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The split-name to index-list mapping.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;splits&quot;</span><span class="p">]</span></div>
+<span class="sd">    """</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"splits"</span><span class="p">]</span></div>
 
 </pre></div>
         </article>

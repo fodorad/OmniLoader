@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Configurable, per-sample transforms: normalization and augmentation.</span>
+<span></span><span class="sd">"""Configurable, per-sample transforms: normalization and augmentation.</span>
 
 <span class="sd">This subpackage groups the transform pipeline used after unification:</span>
 
@@ -297,7 +297,7 @@
 
 <span class="sd">Compose transforms with :class:`Compose`, or build one from a list of config dicts</span>
 <span class="sd">with :func:`build_transform`.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -335,23 +335,23 @@
 
 <span class="c1">#: Registry mapping transform names (as used in config) to their classes.</span>
 <span class="n">TRANSFORMS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">Transform</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;normalize&quot;</span><span class="p">:</span> <span class="n">Normalize</span><span class="p">,</span>
-    <span class="s2">&quot;min_max_normalize&quot;</span><span class="p">:</span> <span class="n">MinMaxNormalize</span><span class="p">,</span>
-    <span class="s2">&quot;robust_normalize&quot;</span><span class="p">:</span> <span class="n">RobustNormalize</span><span class="p">,</span>
-    <span class="s2">&quot;instance_normalize&quot;</span><span class="p">:</span> <span class="n">InstanceNormalize</span><span class="p">,</span>
-    <span class="s2">&quot;per_dataset_normalize&quot;</span><span class="p">:</span> <span class="n">PerDatasetNormalize</span><span class="p">,</span>
-    <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">:</span> <span class="n">GaussianNoise</span><span class="p">,</span>
-    <span class="s2">&quot;feature_dropout&quot;</span><span class="p">:</span> <span class="n">FeatureDropout</span><span class="p">,</span>
-    <span class="s2">&quot;span_masking&quot;</span><span class="p">:</span> <span class="n">SpanMasking</span><span class="p">,</span>
-    <span class="s2">&quot;feature_masking&quot;</span><span class="p">:</span> <span class="n">FeatureMasking</span><span class="p">,</span>
-    <span class="s2">&quot;time_warp&quot;</span><span class="p">:</span> <span class="n">TimeWarp</span><span class="p">,</span>
-    <span class="s2">&quot;random_crop&quot;</span><span class="p">:</span> <span class="n">RandomCrop</span><span class="p">,</span>
-    <span class="s2">&quot;center_crop&quot;</span><span class="p">:</span> <span class="n">CenterCrop</span><span class="p">,</span>
+    <span class="s2">"normalize"</span><span class="p">:</span> <span class="n">Normalize</span><span class="p">,</span>
+    <span class="s2">"min_max_normalize"</span><span class="p">:</span> <span class="n">MinMaxNormalize</span><span class="p">,</span>
+    <span class="s2">"robust_normalize"</span><span class="p">:</span> <span class="n">RobustNormalize</span><span class="p">,</span>
+    <span class="s2">"instance_normalize"</span><span class="p">:</span> <span class="n">InstanceNormalize</span><span class="p">,</span>
+    <span class="s2">"per_dataset_normalize"</span><span class="p">:</span> <span class="n">PerDatasetNormalize</span><span class="p">,</span>
+    <span class="s2">"gaussian_noise"</span><span class="p">:</span> <span class="n">GaussianNoise</span><span class="p">,</span>
+    <span class="s2">"feature_dropout"</span><span class="p">:</span> <span class="n">FeatureDropout</span><span class="p">,</span>
+    <span class="s2">"span_masking"</span><span class="p">:</span> <span class="n">SpanMasking</span><span class="p">,</span>
+    <span class="s2">"feature_masking"</span><span class="p">:</span> <span class="n">FeatureMasking</span><span class="p">,</span>
+    <span class="s2">"time_warp"</span><span class="p">:</span> <span class="n">TimeWarp</span><span class="p">,</span>
+    <span class="s2">"random_crop"</span><span class="p">:</span> <span class="n">RandomCrop</span><span class="p">,</span>
+    <span class="s2">"center_crop"</span><span class="p">:</span> <span class="n">CenterCrop</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1">#: Transforms taking precomputed ``stats`` (not a schema) in their config.</span>
 <span class="n">_STATS_TRANSFORMS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="s2">&quot;min_max_normalize&quot;</span><span class="p">,</span> <span class="s2">&quot;robust_normalize&quot;</span><span class="p">,</span> <span class="s2">&quot;per_dataset_normalize&quot;</span><span class="p">}</span>
+    <span class="p">{</span><span class="s2">"normalize"</span><span class="p">,</span> <span class="s2">"min_max_normalize"</span><span class="p">,</span> <span class="s2">"robust_normalize"</span><span class="p">,</span> <span class="s2">"per_dataset_normalize"</span><span class="p">}</span>
 <span class="p">)</span>
 
 
@@ -361,7 +361,7 @@
     <span class="n">configs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Compose</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a :class:`Compose` from a list of transform config dicts.</span>
+<span class="w">    </span><span class="sd">"""Build a :class:`Compose` from a list of transform config dicts.</span>
 
 <span class="sd">    Each config dict has a ``name`` (a key of :data:`TRANSFORMS`) and the</span>
 <span class="sd">    remaining keys are forwarded as keyword arguments. Schema-aware transforms</span>
@@ -382,52 +382,52 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a config names an unknown transform.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">transforms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Transform</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">cfg</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
         <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TRANSFORMS</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown transform </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">TRANSFORMS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown transform </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">TRANSFORMS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="c1"># Load stats from a saved JSON file when referenced by path (inline wins).</span>
-        <span class="n">stats_path</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;stats_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">stats_path</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"stats_path"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stats_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;stats&quot;</span><span class="p">,</span> <span class="n">load_stats</span><span class="p">(</span><span class="n">stats_path</span><span class="p">))</span>
-        <span class="n">union_stats_path</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;union_stats_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"stats"</span><span class="p">,</span> <span class="n">load_stats</span><span class="p">(</span><span class="n">stats_path</span><span class="p">))</span>
+        <span class="n">union_stats_path</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"union_stats_path"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">union_stats_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;union_stats&quot;</span><span class="p">,</span> <span class="n">load_stats</span><span class="p">(</span><span class="n">union_stats_path</span><span class="p">))</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"union_stats"</span><span class="p">,</span> <span class="n">load_stats</span><span class="p">(</span><span class="n">union_stats_path</span><span class="p">))</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="n">TRANSFORMS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="c1"># Inject the schema for schema-aware transforms unless keys are explicit.</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_STATS_TRANSFORMS</span> <span class="ow">and</span> <span class="s2">&quot;keys&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_STATS_TRANSFORMS</span> <span class="ow">and</span> <span class="s2">"keys"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"schema"</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">Compose</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span> <span class="k">if</span> <span class="n">transforms</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;TRANSFORMS&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CenterCrop&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Compose&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FeatureDropout&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FeatureMasking&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;GaussianNoise&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;InstanceNormalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;MinMaxNormalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;MixupCollator&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Normalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;PerDatasetNormalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;RandomCrop&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;RobustNormalize&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SpanMasking&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;TimeWarp&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Transform&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;build_transform&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;compute_dataset_stats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;compute_feature_stats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;compute_stats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;load_stats&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;save_stats&quot;</span><span class="p">,</span>
+    <span class="s2">"TRANSFORMS"</span><span class="p">,</span>
+    <span class="s2">"CenterCrop"</span><span class="p">,</span>
+    <span class="s2">"Compose"</span><span class="p">,</span>
+    <span class="s2">"FeatureDropout"</span><span class="p">,</span>
+    <span class="s2">"FeatureMasking"</span><span class="p">,</span>
+    <span class="s2">"GaussianNoise"</span><span class="p">,</span>
+    <span class="s2">"InstanceNormalize"</span><span class="p">,</span>
+    <span class="s2">"MinMaxNormalize"</span><span class="p">,</span>
+    <span class="s2">"MixupCollator"</span><span class="p">,</span>
+    <span class="s2">"Normalize"</span><span class="p">,</span>
+    <span class="s2">"PerDatasetNormalize"</span><span class="p">,</span>
+    <span class="s2">"RandomCrop"</span><span class="p">,</span>
+    <span class="s2">"RobustNormalize"</span><span class="p">,</span>
+    <span class="s2">"SpanMasking"</span><span class="p">,</span>
+    <span class="s2">"TimeWarp"</span><span class="p">,</span>
+    <span class="s2">"Transform"</span><span class="p">,</span>
+    <span class="s2">"build_transform"</span><span class="p">,</span>
+    <span class="s2">"compute_dataset_stats"</span><span class="p">,</span>
+    <span class="s2">"compute_feature_stats"</span><span class="p">,</span>
+    <span class="s2">"compute_stats"</span><span class="p">,</span>
+    <span class="s2">"load_stats"</span><span class="p">,</span>
+    <span class="s2">"save_stats"</span><span class="p">,</span>
 <span class="p">]</span>
 </pre></div>
         </article>

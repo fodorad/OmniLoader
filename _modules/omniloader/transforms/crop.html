@@ -280,13 +280,13 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.crop</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Sequence cropping transforms (random window for train, center for eval).</span>
+<span></span><span class="sd">"""Sequence cropping transforms (random window for train, center for eval).</span>
 
 <span class="sd">Both crops take a fixed-length window along the sequence axis. A **single shared</span>
 <span class="sd">offset** is applied across every targeted sequence key, so time-aligned features</span>
 <span class="sd">and per-step targets stay in sync. Keys shorter than the requested window are</span>
 <span class="sd">padded back to ``length`` with their placeholder value.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -304,44 +304,44 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_all_sequence_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return explicit ``keys`` or every sequence key (features *and* targets).</span>
+<span class="w">    </span><span class="sd">"""Return explicit ``keys`` or every sequence key (features *and* targets).</span>
 
 <span class="sd">    Cropping must move features and their aligned per-step targets together, so</span>
 <span class="sd">    unlike :func:`~omniloader.transforms.base.resolve_sequence_keys` (features</span>
 <span class="sd">    only) this includes sequence targets.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either keys or a schema must be provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Either keys or a schema must be provided"</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">specs</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">is_sequence</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_valid_length</span><span class="p">(</span><span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the largest valid-length across the targeted keys present in ``sample``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the largest valid-length across the targeted keys present in ``sample``."""</span>
     <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask&quot;</span> <span class="ow">in</span> <span class="n">sample</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask"</span> <span class="ow">in</span> <span class="n">sample</span>
     <span class="p">]</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="k">if</span> <span class="n">lengths</span> <span class="k">else</span> <span class="mi">0</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_apply_window</span><span class="p">(</span><span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Slice ``[start:start+length]`` from each key and pad back to ``length``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Slice ``[start:start+length]`` from each key and pad back to ``length``."""</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">][</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">][</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
         <span class="c1"># If the slice is short (key ran out), pad back to the requested length.</span>
-        <span class="c1"># (T&#39;, ...) -&gt; (length, ...); mask (T&#39;,) -&gt; (length,)</span>
+        <span class="c1"># (T', ...) -&gt; (length, ...); mask (T',) -&gt; (length,)</span>
         <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_or_crop_time_dim</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">length</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_or_crop_time_dim</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">length</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
+        <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pad_or_crop_time_dim</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">length</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="RandomCrop">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/crop/index.html#omniloader.transforms.crop.RandomCrop">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RandomCrop</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crop a random contiguous window of the sequence (training augmentation).</span>
+<span class="w">    </span><span class="sd">"""Crop a random contiguous window of the sequence (training augmentation).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        length: Window length along the sequence axis.</span>
@@ -350,7 +350,7 @@
 <span class="sd">            cropped together (requires ``schema``).</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -366,7 +366,7 @@
 <div class="viewcode-block" id="RandomCrop.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/crop/index.html#omniloader.transforms.crop.RandomCrop.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crop all targeted keys at one random offset within the valid region.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Crop all targeted keys at one random offset within the valid region."""</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">_valid_length</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
         <span class="n">max_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">valid</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="p">(</span>
@@ -383,7 +383,7 @@
 <div class="viewcode-block" id="CenterCrop">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/crop/index.html#omniloader.transforms.crop.CenterCrop">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CenterCrop</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crop the centered window of the sequence (deterministic; used for eval).</span>
+<span class="w">    </span><span class="sd">"""Crop the centered window of the sequence (deterministic; used for eval).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        length: Window length along the sequence axis.</span>
@@ -391,7 +391,7 @@
 <span class="sd">            schema is cropped (requires ``schema``).</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -407,7 +407,7 @@
 <div class="viewcode-block" id="CenterCrop.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/crop/index.html#omniloader.transforms.crop.CenterCrop.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crop all targeted keys at the centered offset within the valid region.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Crop all targeted keys at the centered offset within the valid region."""</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="n">_valid_length</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">valid</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">_apply_window</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>

@@ -46,7 +46,7 @@ Module Contents
    :type:  dict[str, type[omniloader.sampling.strategies.MixingStrategy]]
 
 .. py:data:: COLLATES
-   :type:  tuple[str, Ellipsis]
+   :type:  tuple[str, ...]
    :value: ('unified', 'dynamic', 'mixup')
 
 

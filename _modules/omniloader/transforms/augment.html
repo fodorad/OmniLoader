@@ -280,16 +280,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.augment</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Augmentation transforms: feature corruption, dropout and span masking.</span>
+<span></span><span class="sd">"""Augmentation transforms: feature corruption, dropout and span masking.</span>
 
 <span class="sd">These transforms are ``train_only`` — they self-skip during evaluation. Each one</span>
 <span class="sd">respects the validity mask and is fully reproducible from an optional</span>
 <span class="sd">:class:`torch.Generator`.</span>
 
 <span class="sd">Literature techniques covered: Gaussian noise injection (feature corruption),</span>
-<span class="sd">whole-feature (&quot;stream&quot;/modality) dropout, and contiguous span masking over</span>
+<span class="sd">whole-feature ("stream"/modality) dropout, and contiguous span masking over</span>
 <span class="sd">sequences (SpecAugment-style temporal masking).</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -316,7 +316,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_reject_structured_keys</span><span class="p">(</span>
     <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise if any ``keys`` is a structured (rank &gt; 1 trailing shape) spec.</span>
+<span class="w">    </span><span class="sd">"""Raise if any ``keys`` is a structured (rank &gt; 1 trailing shape) spec.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema: Schema to resolve specs from. A no-op when ``None`` (the caller</span>
@@ -325,9 +325,9 @@
 <span class="sd">        transform: Name of the calling transform, for the error message.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If any key&#39;s trailing shape has more than one axis.</span>
+<span class="sd">        ValueError: If any key's trailing shape has more than one axis.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -338,16 +338,16 @@
         <span class="n">trailing</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">trailing_shape</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trailing</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> only supports a single trailing feature axis; &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;spec </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has trailing shape </span><span class="si">{</span><span class="n">trailing</span><span class="si">}</span><span class="s2">, which has no single &quot;</span>
-                <span class="s2">&quot;feature axis. Not supported for image/structured sequences.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> only supports a single trailing feature axis; "</span>
+                <span class="sa">f</span><span class="s2">"spec </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has trailing shape </span><span class="si">{</span><span class="n">trailing</span><span class="si">}</span><span class="s2">, which has no single "</span>
+                <span class="s2">"feature axis. Not supported for image/structured sequences."</span>
             <span class="p">)</span>
 
 
 <div class="viewcode-block" id="GaussianNoise">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.GaussianNoise">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GaussianNoise</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add zero-mean Gaussian noise to feature values (feature corruption).</span>
+<span class="w">    </span><span class="sd">"""Add zero-mean Gaussian noise to feature values (feature corruption).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        keys: Feature keys to corrupt. When ``None``, every feature in the</span>
@@ -356,7 +356,7 @@
 <span class="sd">        p: Per-sample probability of applying noise to each key.</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -374,13 +374,13 @@
 <div class="viewcode-block" id="GaussianNoise.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.GaussianNoise.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add noise to each eligible key with probability ``p``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Add noise to each eligible key with probability ``p``."""</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># (..., F) or (...,)</span>
             <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span>
-            <span class="n">mask_b</span> <span class="o">=</span> <span class="n">broadcast_mask</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">mask_b</span> <span class="o">=</span> <span class="n">broadcast_mask</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
             <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_b</span><span class="p">,</span> <span class="n">value</span> <span class="o">+</span> <span class="n">noise</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 </div>
@@ -390,9 +390,9 @@
 <div class="viewcode-block" id="FeatureDropout">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.FeatureDropout">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FeatureDropout</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Drop entire features (&quot;stream&quot;/modality dropout).</span>
+<span class="w">    </span><span class="sd">"""Drop entire features ("stream"/modality dropout).</span>
 
-<span class="sd">    With probability ``p`` a feature&#39;s value is zeroed and its mask set to all</span>
+<span class="sd">    With probability ``p`` a feature's value is zeroed and its mask set to all</span>
 <span class="sd">    ``False``, so a model treats it as absent. This generalises modality dropout</span>
 <span class="sd">    to any set of feature streams. Optionally guarantees at least one eligible</span>
 <span class="sd">    feature survives.</span>
@@ -404,7 +404,7 @@
 <span class="sd">        keep_at_least_one: When ``True``, never drop the last surviving feature.</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -422,15 +422,15 @@
 <div class="viewcode-block" id="FeatureDropout.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.FeatureDropout.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Zero and invalidate each eligible feature with probability ``p``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Zero and invalidate each eligible feature with probability ``p``."""</span>
         <span class="c1"># Only consider features that are present and currently have valid data.</span>
-        <span class="n">present</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">())]</span>
+        <span class="n">present</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span><span class="o">.</span><span class="n">any</span><span class="p">())]</span>
         <span class="n">drop</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">present</span> <span class="k">if</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_at_least_one</span> <span class="ow">and</span> <span class="n">drop</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">present</span><span class="p">):</span>
             <span class="n">drop</span> <span class="o">=</span> <span class="n">drop</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># keep the first eligible feature valid</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">drop</span><span class="p">:</span>
             <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-            <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">])</span>
+            <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 </div>
 
@@ -439,7 +439,7 @@
 <div class="viewcode-block" id="SpanMasking">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.SpanMasking">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SpanMasking</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Zero contiguous spans of sequence features (SpecAugment-style masking).</span>
+<span class="w">    </span><span class="sd">"""Zero contiguous spans of sequence features (SpecAugment-style masking).</span>
 
 <span class="sd">    For each configured sequence feature, up to ``num_spans`` contiguous spans of</span>
 <span class="sd">    length ``span_len`` are zeroed within the valid region. The validity mask is</span>
@@ -454,7 +454,7 @@
 <span class="sd">        p: Per-sample probability of masking each eligible key.</span>
 <span class="sd">        schema: Schema used to resolve sequence ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -474,11 +474,11 @@
 <div class="viewcode-block" id="SpanMasking.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.SpanMasking.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Zero up to ``num_spans`` spans per eligible sequence feature.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Zero up to ``num_spans`` spans per eligible sequence feature."""</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span>  <span class="c1"># (T,)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span>  <span class="c1"># (T,)</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">as_tuple</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -501,7 +501,7 @@
 <div class="viewcode-block" id="TimeWarp">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.TimeWarp">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TimeWarp</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Randomly stretch/squeeze the sequence in time (speed perturbation).</span>
+<span class="w">    </span><span class="sd">"""Randomly stretch/squeeze the sequence in time (speed perturbation).</span>
 
 <span class="sd">    A single warp rate ``r`` in ``[min_rate, max_rate]`` is shared across the</span>
 <span class="sd">    targeted keys (so aligned features stay in sync): each sequence is resampled</span>
@@ -517,7 +517,7 @@
 <span class="sd">        p: Per-sample probability of warping.</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -532,14 +532,14 @@
         <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either keys or a schema must be provided&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Either keys or a schema must be provided"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">features</span>
                 <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">is_sequence</span> <span class="ow">and</span> <span class="n">spec</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">is_floating_point</span>
             <span class="p">]</span>
-        <span class="n">_reject_structured_keys</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="s2">&quot;TimeWarp&quot;</span><span class="p">)</span>
+        <span class="n">_reject_structured_keys</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="s2">"TimeWarp"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span> <span class="o">=</span> <span class="n">min_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_rate</span> <span class="o">=</span> <span class="n">max_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
@@ -547,7 +547,7 @@
 <div class="viewcode-block" id="TimeWarp.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.TimeWarp.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resample each targeted key by a single shared random rate.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Resample each targeted key by a single shared random rate."""</span>
         <span class="k">if</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
         <span class="n">rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span> <span class="o">+</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_rate</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_rate</span><span class="p">)</span>
@@ -557,16 +557,16 @@
             <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># (T, F) or (T,)</span>
             <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;TimeWarp only supports scalar/feature-vector sequences (T,)/(T, F); &quot;</span>
-                    <span class="s2">&quot;image-sequence specs would be linearly blended frame-to-frame, which &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;distorts video content. Got key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> with shape </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="s2">"TimeWarp only supports scalar/feature-vector sequences (T,)/(T, F); "</span>
+                    <span class="s2">"image-sequence specs would be linearly blended frame-to-frame, which "</span>
+                    <span class="sa">f</span><span class="s2">"distorts video content. Got key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> with shape </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
                 <span class="p">)</span>
             <span class="n">length</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">new_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">length</span> <span class="o">*</span> <span class="n">rate</span><span class="p">))</span>
             <span class="n">squeeze</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">squeeze</span> <span class="k">else</span> <span class="n">value</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span>  <span class="c1"># (1, C, T)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">new_len</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># back to T</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">new_len</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># back to T</span>
             <span class="n">warped</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">squeeze</span> <span class="k">else</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># (T,) or (T, F)</span>
             <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">warped</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
@@ -577,14 +577,14 @@
 <div class="viewcode-block" id="FeatureMasking">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.FeatureMasking">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FeatureMasking</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Zero contiguous bands of feature dimensions (channel/frequency masking).</span>
+<span class="w">    </span><span class="sd">"""Zero contiguous bands of feature dimensions (channel/frequency masking).</span>
 
 <span class="sd">    For each targeted key with a feature axis, ``num_masks`` bands of width up to</span>
 <span class="sd">    ``max_width`` are zeroed across all time steps — the feature-axis analogue of</span>
 <span class="sd">    :class:`SpanMasking`.</span>
 
 <span class="sd">    Not supported for structured (e.g. image-sequence) specs, which have no</span>
-<span class="sd">    single trailing feature axis to band-mask — a spec&#39;s trailing shape is</span>
+<span class="sd">    single trailing feature axis to band-mask — a spec's trailing shape is</span>
 <span class="sd">    checked against ``schema`` when available (either passed directly, or via</span>
 <span class="sd">    ``keys=None``); use :class:`SpanMasking` to mask whole time steps instead.</span>
 
@@ -597,7 +597,7 @@
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``, and to</span>
 <span class="sd">            reject structured (image-sequence) keys ahead of time.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -610,7 +610,7 @@
         <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">resolve_keys</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
-        <span class="n">_reject_structured_keys</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="s2">&quot;FeatureMasking&quot;</span><span class="p">)</span>
+        <span class="n">_reject_structured_keys</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="s2">"FeatureMasking"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_masks</span> <span class="o">=</span> <span class="n">num_masks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_width</span> <span class="o">=</span> <span class="n">max_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
@@ -618,7 +618,7 @@
 <div class="viewcode-block" id="FeatureMasking.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/augment/index.html#omniloader.transforms.augment.FeatureMasking.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Zero up to ``num_masks`` feature bands per eligible key.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Zero up to ``num_masks`` feature bands per eligible key."""</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="n">_rand</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:</span>
                 <span class="k">continue</span>

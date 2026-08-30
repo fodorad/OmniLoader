@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.sampling.strategies</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Dataset-mixing strategies that decide the per-epoch sampling scheme.</span>
+<span></span><span class="sd">"""Dataset-mixing strategies that decide the per-epoch sampling scheme.</span>
 
 <span class="sd">Each strategy answers one question: *given several datasets of possibly very</span>
 <span class="sd">different sizes, how many samples from each should the network see per epoch, and</span>
@@ -296,7 +296,7 @@
 <span class="sd">  (``temperature=2`` recovers square-root scaling).</span>
 <span class="sd">* :class:`FixedWeightStrategy` — explicit per-dataset weights, or uniform.</span>
 <span class="sd">* :class:`RoundRobinStrategy` — a fixed effective size per dataset, interleaved.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -316,7 +316,7 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.SubsampleConfig">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SubsampleConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-dataset sampling options.</span>
+<span class="w">    </span><span class="sd">"""Per-dataset sampling options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        replacement: Whether indices may repeat within an epoch.</span>
@@ -326,7 +326,7 @@
 <span class="sd">        sample_weights: Optional per-sample weights (length = dataset size) for</span>
 <span class="sd">            skewed within-dataset sampling, e.g. class balancing.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">replacement</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">policy</span><span class="p">:</span> <span class="n">ExhaustionPolicy</span> <span class="o">=</span> <span class="n">ExhaustionPolicy</span><span class="o">.</span><span class="n">FRESH</span>
@@ -338,7 +338,7 @@
 <div class="viewcode-block" id="MixingStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.MixingStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MixingStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class turning per-dataset sizes into per-epoch global index lists.</span>
+<span class="w">    </span><span class="sd">"""Base class turning per-dataset sizes into per-epoch global index lists.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sizes: Number of samples in each dataset, in OmniLoader order.</span>
@@ -349,7 +349,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``sizes`` is empty or contains a non-positive entry.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -358,15 +358,15 @@
         <span class="n">subsample</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SubsampleConfig</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sizes</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one dataset is required&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"At least one dataset is required"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset sizes must be positive, got </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset sizes must be positive, got </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span> <span class="o">=</span> <span class="n">_prefix_offsets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span>
         <span class="n">configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subsample</span><span class="p">)</span> <span class="k">if</span> <span class="n">subsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;subsample must have one entry per dataset&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"subsample must have one entry per dataset"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="ow">or</span> <span class="n">SubsampleConfig</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pools</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">IndexPool</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">replacement</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">policy</span><span class="p">,</span> <span class="n">seed</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">sample_weights</span><span class="p">)</span>
@@ -377,7 +377,7 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.MixingStrategy.target_counts">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of samples each dataset contributes in ``epoch``.</span>
+<span class="w">        </span><span class="sd">"""Number of samples each dataset contributes in ``epoch``.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The epoch number (used only by epoch-dependent strategies</span>
@@ -386,11 +386,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list with one non-negative count per dataset.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        """</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_effective_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply per-dataset ``effective_size`` overrides on top of the strategy.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Apply per-dataset ``effective_size`` overrides on top of the strategy."""</span>
         <span class="n">counts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_counts</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">effective_size</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">effective_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">count</span>
@@ -400,7 +400,7 @@
 <div class="viewcode-block" id="MixingStrategy.epoch_indices">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.MixingStrategy.epoch_indices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">epoch_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the shuffled list of global indices to visit this epoch.</span>
+<span class="w">        </span><span class="sd">"""Build the shuffled list of global indices to visit this epoch.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The epoch number, used to seed draws and the final shuffle.</span>
@@ -408,7 +408,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A flat list of global indices into the concatenated dataset.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">pool</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pools</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_counts</span><span class="p">(</span><span class="n">epoch</span><span class="p">)):</span>
             <span class="n">indices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">epoch</span><span class="p">))</span>
@@ -418,7 +418,7 @@
 <div class="viewcode-block" id="MixingStrategy.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.MixingStrategy.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total number of samples produced per epoch (evaluated at epoch 0).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Total number of samples produced per epoch (evaluated at epoch 0)."""</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_effective_counts</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span></div>
 </div>
 
@@ -427,12 +427,12 @@
 <div class="viewcode-block" id="ProportionalStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.ProportionalStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ProportionalStrategy</span><span class="p">(</span><span class="n">MixingStrategy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample each dataset in proportion to its true size (full concatenation).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Sample each dataset in proportion to its true size (full concatenation)."""</span>
 
 <div class="viewcode-block" id="ProportionalStrategy.target_counts">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.ProportionalStrategy.target_counts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>  <span class="c1"># noqa: ARG002 (epoch-independent)</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return each dataset&#39;s full size.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return each dataset's full size."""</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span></div>
 </div>
 
@@ -441,7 +441,7 @@
 <div class="viewcode-block" id="TemperatureStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.TemperatureStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TemperatureStrategy</span><span class="p">(</span><span class="n">MixingStrategy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Re-weight datasets by ``size ** (1 / temperature)``.</span>
+<span class="w">    </span><span class="sd">"""Re-weight datasets by ``size ** (1 / temperature)``.</span>
 
 <span class="sd">    ``temperature=1`` reduces to proportional sampling; ``temperature=2`` is</span>
 <span class="sd">    square-root scaling; larger values push the mixture toward uniform. The</span>
@@ -457,7 +457,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``temperature`` is less than 1.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -467,14 +467,14 @@
         <span class="n">subsample</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SubsampleConfig</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">temperature</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;temperature must be &gt;= 1, got </span><span class="si">{</span><span class="n">temperature</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"temperature must be &gt;= 1, got </span><span class="si">{</span><span class="n">temperature</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">subsample</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TemperatureStrategy.target_counts">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.TemperatureStrategy.target_counts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>  <span class="c1"># noqa: ARG002 (epoch-independent)</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return per-dataset counts weighted by ``size ** (1 / temperature)``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return per-dataset counts weighted by ``size ** (1 / temperature)``."""</span>
         <span class="k">return</span> <span class="n">_temperature_counts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span></div>
 </div>
 
@@ -483,7 +483,7 @@
 <div class="viewcode-block" id="FixedWeightStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.FixedWeightStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FixedWeightStrategy</span><span class="p">(</span><span class="n">MixingStrategy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample datasets according to explicit weights (or uniformly).</span>
+<span class="w">    </span><span class="sd">"""Sample datasets according to explicit weights (or uniformly).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sizes: Per-dataset sizes.</span>
@@ -496,7 +496,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``weights`` has the wrong length or is not positive.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -509,9 +509,9 @@
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights must have one entry per dataset&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must have one entry per dataset"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">w</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights must be non-negative with a positive sum&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"weights must be non-negative with a positive sum"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch_size</span> <span class="o">=</span> <span class="n">epoch_size</span> <span class="k">if</span> <span class="n">epoch_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">subsample</span><span class="p">)</span>
@@ -519,7 +519,7 @@
 <div class="viewcode-block" id="FixedWeightStrategy.target_counts">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.FixedWeightStrategy.target_counts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>  <span class="c1"># noqa: ARG002 (epoch-independent)</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return per-dataset counts apportioned by the fixed weights.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return per-dataset counts apportioned by the fixed weights."""</span>
         <span class="k">return</span> <span class="n">_apportion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_size</span><span class="p">)</span></div>
 </div>
 
@@ -528,10 +528,10 @@
 <div class="viewcode-block" id="RoundRobinStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.RoundRobinStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RoundRobinStrategy</span><span class="p">(</span><span class="n">MixingStrategy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a fixed number of samples per dataset and interleave them.</span>
+<span class="w">    </span><span class="sd">"""Draw a fixed number of samples per dataset and interleave them.</span>
 
 <span class="sd">    Unlike the weighted strategies, this one takes an explicit effective size</span>
-<span class="sd">    per dataset (default: the smallest dataset&#39;s size, so every dataset</span>
+<span class="sd">    per dataset (default: the smallest dataset's size, so every dataset</span>
 <span class="sd">    contributes equally) and interleaves the datasets round-robin rather than</span>
 <span class="sd">    globally shuffling, which keeps batches diverse across datasets.</span>
 
@@ -543,7 +543,7 @@
 <span class="sd">        subsample: Optional per-dataset configs (``effective_size`` overrides</span>
 <span class="sd">            ``samples_per_dataset`` for that dataset).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -558,7 +558,7 @@
 <div class="viewcode-block" id="RoundRobinStrategy.target_counts">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.RoundRobinStrategy.target_counts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>  <span class="c1"># noqa: ARG002 (epoch-independent)</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an equal count per dataset (smallest size unless overridden).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return an equal count per dataset (smallest size unless overridden)."""</span>
         <span class="n">count</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_dataset</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_per_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span>
         <span class="p">)</span>
@@ -568,7 +568,7 @@
 <div class="viewcode-block" id="RoundRobinStrategy.epoch_indices">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.RoundRobinStrategy.epoch_indices">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">epoch_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interleave datasets round-robin instead of globally shuffling.</span>
+<span class="w">        </span><span class="sd">"""Interleave datasets round-robin instead of globally shuffling.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The epoch number.</span>
@@ -577,7 +577,7 @@
 <span class="sd">            Global indices ordered so consecutive samples come from different</span>
 <span class="sd">            datasets where possible.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">per_dataset</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">pool</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pools</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_effective_counts</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
@@ -590,7 +590,7 @@
 <div class="viewcode-block" id="AnnealedTemperatureStrategy">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.AnnealedTemperatureStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AnnealedTemperatureStrategy</span><span class="p">(</span><span class="n">MixingStrategy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temperature sampling whose temperature anneals across epochs.</span>
+<span class="w">    </span><span class="sd">"""Temperature sampling whose temperature anneals across epochs.</span>
 
 <span class="sd">    Multilingual/multi-task training often starts near-uniform (high temperature,</span>
 <span class="sd">    up-weighting small datasets) and anneals toward proportional (temperature 1)</span>
@@ -609,7 +609,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a temperature is below 1 or ``num_epochs`` is not positive.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -621,9 +621,9 @@
         <span class="n">subsample</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SubsampleConfig</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">start_temperature</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">end_temperature</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperatures must be &gt;= 1&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"temperatures must be &gt;= 1"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">num_epochs</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;num_epochs must be positive, got </span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"num_epochs must be positive, got </span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_temperature</span> <span class="o">=</span> <span class="n">start_temperature</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_temperature</span> <span class="o">=</span> <span class="n">end_temperature</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">=</span> <span class="n">num_epochs</span>
@@ -632,7 +632,7 @@
 <div class="viewcode-block" id="AnnealedTemperatureStrategy.temperature_at">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.AnnealedTemperatureStrategy.temperature_at">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">temperature_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the interpolated temperature for ``epoch``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the interpolated temperature for ``epoch``."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_temperature</span>
         <span class="n">frac</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 0 -&gt; 1</span>
@@ -642,20 +642,20 @@
 <div class="viewcode-block" id="AnnealedTemperatureStrategy.target_counts">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/strategies/index.html#omniloader.sampling.strategies.AnnealedTemperatureStrategy.target_counts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">target_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return counts using the epoch&#39;s annealed temperature.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return counts using the epoch's annealed temperature."""</span>
         <span class="k">return</span> <span class="n">_temperature_counts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature_at</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span></div>
 </div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_temperature_counts</span><span class="p">(</span><span class="n">sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apportion ``sum(sizes)`` samples by ``size ** (1 / temperature)`` weights.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Apportion ``sum(sizes)`` samples by ``size ** (1 / temperature)`` weights."""</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">temperature</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">_apportion</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_prefix_offsets</span><span class="p">(</span><span class="n">sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the starting global offset of each dataset in the concatenation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the starting global offset of each dataset in the concatenation."""</span>
     <span class="n">offsets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">running</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>
@@ -665,7 +665,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_apportion</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distribute ``total`` items across buckets by weight using largest remainder.</span>
+<span class="w">    </span><span class="sd">"""Distribute ``total`` items across buckets by weight using largest remainder.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        weights: Non-negative relative weights.</span>
@@ -674,7 +674,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Integer counts summing exactly to ``total``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">weight_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
     <span class="n">exact</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="o">/</span> <span class="n">weight_sum</span> <span class="o">*</span> <span class="n">total</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
     <span class="n">floors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">exact</span><span class="p">]</span>
@@ -687,7 +687,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deterministically shuffle a list of indices.</span>
+<span class="w">    </span><span class="sd">"""Deterministically shuffle a list of indices.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        indices: Indices to shuffle.</span>
@@ -696,7 +696,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A new shuffled list.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">indices</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
     <span class="n">gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span>
@@ -706,15 +706,15 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_interleave</span><span class="p">(</span><span class="n">groups</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interleave several index lists round-robin, dropping exhausted groups.</span>
+<span class="w">    </span><span class="sd">"""Interleave several index lists round-robin, dropping exhausted groups.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        groups: One index list per dataset.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A single interleaved list preserving each group&#39;s internal order.</span>
+<span class="sd">        A single interleaved list preserving each group's internal order.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">cursors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
     <span class="n">remaining</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">)</span>

@@ -10,7 +10,9 @@ omniloader.utils.seeding
    :func:`seed_worker` is a ``DataLoader(worker_init_fn=...)`` callback that gives
    each worker process a deterministic, distinct RNG state derived from PyTorch's
    per-worker seed, so any randomness that falls back to the global NumPy/Python/torch
-   RNGs (rather than an explicit :class:`torch.Generator`) is reproducible.
+   RNGs (rather than an explicit :class:`torch.Generator`) is reproducible. It also
+   resets any HDF5-backed dataset reachable from the worker's dataset, since HDF5
+   handles are not fork-safe (see :meth:`omniloader.data.datasets.HDF5Dataset.reset_for_worker`).
 
 
 
@@ -27,11 +29,18 @@ Module Contents
 
 .. py:function:: seed_worker(worker_id: int) -> None
 
-   Seed a DataLoader worker's Python, NumPy and torch RNGs deterministically.
+   Seed a DataLoader worker's RNGs and give it its own HDF5 handles.
 
    Pass as ``DataLoader(worker_init_fn=seed_worker)``. PyTorch already sets a
    distinct ``torch.initial_seed()`` per worker (derived from the base seed and
    worker id); this propagates it to the other RNGs.
+
+   A ``fork``-started worker (the default on Linux/macOS) also inherits
+   whatever HDF5 file handles were already open in the parent process, and
+   those handles are not fork-safe — reading them from more than one process
+   hangs rather than raising. This clears any such handle so the lazy reopen
+   happens inside the worker, as intended by
+   :meth:`omniloader.data.datasets.HDF5Dataset._handle`.
 
    :param worker_id: The worker index supplied by the DataLoader (unused; the seed
                      is taken from ``torch.initial_seed`` which already encodes it).

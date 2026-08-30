@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.loader</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;The OmniLoader meta-dataset that unifies several disjoint datasets.</span>
+<span></span><span class="sd">"""The OmniLoader meta-dataset that unifies several disjoint datasets.</span>
 
 <span class="sd">:class:`OmniLoader` concatenates any number of source datasets, each paired with</span>
 <span class="sd">a :class:`~omniloader.schema.spec.DatasetSchema`, and presents them as one dataset whose</span>
@@ -290,7 +290,7 @@
 <span class="sd">samples from different datasets. A :class:`~omniloader.sampling.strategies.MixingStrategy`</span>
 <span class="sd">(obtained via :meth:`OmniLoader.make_sampler`) controls how the datasets are</span>
 <span class="sd">balanced across an epoch.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -320,19 +320,19 @@
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.SizedDataset">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SizedDataset</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A map-style dataset that reports its length and returns dict samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A map-style dataset that reports its length and returns dict samples."""</span>
 
 <div class="viewcode-block" id="SizedDataset.__len__">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.SizedDataset.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of samples.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the number of samples."""</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="SizedDataset.__getitem__">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.SizedDataset.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sample at ``index``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the sample at ``index``."""</span>
         <span class="o">...</span></div>
 </div>
 
@@ -341,7 +341,7 @@
 <div class="viewcode-block" id="OmniLoader">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OmniLoader</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unify multiple datasets into a single masked, concatenated dataset.</span>
+<span class="w">    </span><span class="sd">"""Unify multiple datasets into a single masked, concatenated dataset.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        datasets: The source datasets. Each must implement ``__len__`` and</span>
@@ -365,7 +365,7 @@
 <span class="sd">        ValueError: If ``datasets`` is empty or its length differs from</span>
 <span class="sd">            ``schemas``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -378,9 +378,9 @@
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">datasets</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;OmniLoader requires at least one dataset&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"OmniLoader requires at least one dataset"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">schemas</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;datasets and schemas must have the same length&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"datasets and schemas must have the same length"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">schemas</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span> <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">UnifiedSchema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="p">)</span>
@@ -395,7 +395,7 @@
 <div class="viewcode-block" id="OmniLoader.set_epoch">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.set_epoch">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the epoch used to seed per-sample augmentation.</span>
+<span class="w">        </span><span class="sd">"""Set the epoch used to seed per-sample augmentation.</span>
 
 <span class="sd">        Call once per epoch (the :class:`~omniloader.integrations.lightning.OmniDataModule`</span>
 <span class="sd">        does this automatically) so augmentation differs across epochs yet stays</span>
@@ -404,38 +404,38 @@
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The upcoming epoch number.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">epoch</span></div>
 
 
 <div class="viewcode-block" id="OmniLoader.__len__">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total number of samples across all source datasets.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Total number of samples across all source datasets."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cumulative</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cumulative</span> <span class="k">else</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="OmniLoader.locate">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.locate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">locate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Map a global index to ``(dataset_index, local_index)``.</span>
+<span class="w">        </span><span class="sd">"""Map a global index to ``(dataset_index, local_index)``.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index: Global index in ``[0, len(self))``. Negative indices count</span>
 <span class="sd">                from the end.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            The owning dataset&#39;s position and the local index within it.</span>
+<span class="sd">            The owning dataset's position and the local index within it.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            IndexError: If ``index`` is out of range.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">+=</span> <span class="n">length</span>
         <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">length</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Index </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Index </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
         <span class="n">dataset_index</span> <span class="o">=</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect_right</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cumulative</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cumulative</span><span class="p">[</span><span class="n">dataset_index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset_index</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">dataset_index</span><span class="p">,</span> <span class="n">index</span> <span class="o">-</span> <span class="n">start</span></div>
@@ -444,7 +444,7 @@
 <div class="viewcode-block" id="OmniLoader.__getitem__">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the unified sample at a global index.</span>
+<span class="w">        </span><span class="sd">"""Return the unified sample at a global index.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index: Global index into the concatenated dataset.</span>
@@ -452,7 +452,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            The sample mapped onto the unified schema with masks and metadata.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">dataset_index</span><span class="p">,</span> <span class="n">local_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_index</span><span class="p">][</span><span class="n">local_index</span><span class="p">]</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unifier</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>  <span class="c1"># raw dict -&gt; full union schema + masks</span>
@@ -468,7 +468,7 @@
 <div class="viewcode-block" id="OmniLoader.describe">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.describe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Summarise this loader&#39;s datasets (coverage, valid fractions, classes).</span>
+<span class="w">        </span><span class="sd">"""Summarise this loader's datasets (coverage, valid fractions, classes).</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            max_samples: Samples read per dataset for the statistics.</span>
@@ -476,7 +476,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A :class:`~omniloader.introspection.Report`.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">omniloader.introspection</span><span class="w"> </span><span class="kn">import</span> <span class="n">describe</span>
 
         <span class="k">return</span> <span class="n">describe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="p">,</span> <span class="n">max_samples</span><span class="o">=</span><span class="n">max_samples</span><span class="p">)</span></div>
@@ -485,7 +485,7 @@
 <div class="viewcode-block" id="OmniLoader.validate">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.validate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check each dataset&#39;s raw samples against its declared specs.</span>
+<span class="w">        </span><span class="sd">"""Check each dataset's raw samples against its declared specs.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            num_samples: Samples probed per dataset.</span>
@@ -494,7 +494,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of issue strings (empty when everything matches).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">omniloader.introspection</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate</span>
 
         <span class="k">return</span> <span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span></div>
@@ -503,9 +503,9 @@
 <div class="viewcode-block" id="OmniLoader.sequence_lengths">
 <a class="viewcode-back" href="../../autoapi/omniloader/loader/index.html#omniloader.loader.OmniLoader.sequence_lengths">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sequence_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the native sequence length of ``key`` for every sample.</span>
+<span class="w">        </span><span class="sd">"""Return the native sequence length of ``key`` for every sample.</span>
 
-<span class="sd">        Reads each source sample&#39;s raw value (bypassing unification/transforms)</span>
+<span class="sd">        Reads each source sample's raw value (bypassing unification/transforms)</span>
 <span class="sd">        and reports the length of its sequence axis, or ``0`` when the sample</span>
 <span class="sd">        lacks the key. Intended to feed</span>
 <span class="sd">        :class:`~omniloader.sampling.bucketing.LengthBucketBatchSampler`.</span>
@@ -520,12 +520,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of per-sample lengths, indexed by global sample index.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">dataset_index</span><span class="p">,</span> <span class="n">local_index</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))):</span>
             <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_index</span><span class="p">][</span><span class="n">local_index</span><span class="p">]</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -541,7 +541,7 @@
         <span class="n">subsample</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SubsampleConfig</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OmniSampler</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an :class:`OmniSampler` for driving a ``DataLoader``.</span>
+<span class="w">        </span><span class="sd">"""Build an :class:`OmniSampler` for driving a ``DataLoader``.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            strategy: A mixing strategy. When ``None``, a</span>
@@ -555,7 +555,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A sampler yielding global indices per epoch.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">strategy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">strategy</span> <span class="o">=</span> <span class="n">ProportionalStrategy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_sizes</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">subsample</span><span class="o">=</span><span class="n">subsample</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">OmniSampler</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span></div>
@@ -564,7 +564,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_cumulative_sizes</span><span class="p">(</span><span class="n">sizes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return cumulative sums used to map global indices to datasets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return cumulative sums used to map global indices to datasets."""</span>
     <span class="n">cumulative</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">running</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">:</span>

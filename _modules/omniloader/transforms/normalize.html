@@ -280,14 +280,14 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.normalize</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Feature normalization transforms.</span>
+<span></span><span class="sd">"""Feature normalization transforms.</span>
 
 <span class="sd">All normalizers apply an affine map ``(x - offset) / (scale + eps)`` only where</span>
 <span class="sd">the validity mask is ``True`` — padding and placeholder positions keep their</span>
 <span class="sd">original value. The stats-based variants take precomputed statistics (see</span>
 <span class="sd">:func:`~omniloader.transforms.stats.compute_stats`); :class:`InstanceNormalize`</span>
 <span class="sd">derives them per sample. All run in both training and evaluation.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -303,17 +303,17 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_parse_pair</span><span class="p">(</span><span class="n">stat</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse one key&#39;s stats into two float tensors from a pair or a mapping.</span>
+<span class="w">    </span><span class="sd">"""Parse one key's stats into two float tensors from a pair or a mapping.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stat: Either a two-element ``(a, b)`` sequence or a mapping containing</span>
 <span class="sd">            ``keys``.</span>
-<span class="sd">        keys: The mapping field names to read (e.g. ``(&quot;mean&quot;, &quot;std&quot;)``).</span>
+<span class="sd">        keys: The mapping field names to read (e.g. ``("mean", "std")``).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The two statistics as float tensors.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">stat</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">stat</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
     <span class="k">else</span><span class="p">:</span>
@@ -324,24 +324,24 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_affine</span><span class="p">(</span>
     <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply ``(x - offset) / (scale + eps)`` to ``key`` where its mask is valid.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Apply ``(x - offset) / (scale + eps)`` to ``key`` where its mask is valid."""</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># (..., F) or (...,)</span>
     <span class="n">normalized</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">scale</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>
-    <span class="n">mask_b</span> <span class="o">=</span> <span class="n">broadcast_mask</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>  <span class="c1"># -&gt; value.shape</span>
+    <span class="n">mask_b</span> <span class="o">=</span> <span class="n">broadcast_mask</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>  <span class="c1"># -&gt; value.shape</span>
     <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_b</span><span class="p">,</span> <span class="n">normalized</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_instance_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardize ``key`` by its own valid statistics, in place.</span>
+<span class="w">    </span><span class="sd">"""Standardize ``key`` by its own valid statistics, in place.</span>
 
 <span class="sd">    For a sequence value the mean/std are taken over the valid time steps (per</span>
 <span class="sd">    feature); for a vector value, over the feature axis. A key that is absent or</span>
 <span class="sd">    has no valid position is left unchanged.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># vector: normalize over the feature axis</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
             <span class="k">return</span>
@@ -355,45 +355,45 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_StatsNormalizer</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base for stats-driven affine normalizers (offset/scale from two fields).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Base for stats-driven affine normalizers (offset/scale from two fields)."""</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">_fields</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
+    <span class="n">_fields</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"mean"</span><span class="p">,</span> <span class="s2">"std"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">_parse_pair</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize each configured key where its mask is valid.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Normalize each configured key where its mask is valid."""</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="n">_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">second</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the divisor given the two parsed statistics.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the divisor given the two parsed statistics."""</span>
         <span class="k">return</span> <span class="n">second</span>
 
 
 <div class="viewcode-block" id="Normalize">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.Normalize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Normalize</span><span class="p">(</span><span class="n">_StatsNormalizer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardize to zero mean and unit variance from ``(mean, std)`` stats.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Standardize to zero mean and unit variance from ``(mean, std)`` stats."""</span>
 
-    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span></div>
+    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"mean"</span><span class="p">,</span> <span class="s2">"std"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="MinMaxNormalize">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.MinMaxNormalize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MinMaxNormalize</span><span class="p">(</span><span class="n">_StatsNormalizer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scale to ``[0, 1]`` from ``(min, max)`` stats (divisor is ``max - min``).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Scale to ``[0, 1]`` from ``(min, max)`` stats (divisor is ``max - min``)."""</span>
 
-    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">)</span>
+    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"min"</span><span class="p">,</span> <span class="s2">"max"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">second</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Divide by the value range ``max - min``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Divide by the value range ``max - min``."""</span>
         <span class="k">return</span> <span class="n">second</span> <span class="o">-</span> <span class="n">offset</span></div>
 
 
@@ -401,16 +401,16 @@
 <div class="viewcode-block" id="RobustNormalize">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.RobustNormalize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RobustNormalize</span><span class="p">(</span><span class="n">_StatsNormalizer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardize by median and IQR from ``(median, iqr)`` stats (outlier-robust).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Standardize by median and IQR from ``(median, iqr)`` stats (outlier-robust)."""</span>
 
-    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="s2">&quot;iqr&quot;</span><span class="p">)</span></div>
+    <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"median"</span><span class="p">,</span> <span class="s2">"iqr"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="InstanceNormalize">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.InstanceNormalize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InstanceNormalize</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardize each sample by its own valid statistics (no external stats).</span>
+<span class="w">    </span><span class="sd">"""Standardize each sample by its own valid statistics (no external stats).</span>
 
 <span class="sd">    For a sequence value the mean/std are taken over the valid time steps</span>
 <span class="sd">    (per feature); for a vector value, over the feature axis.</span>
@@ -421,7 +421,7 @@
 <span class="sd">        eps: Small constant added to the std.</span>
 <span class="sd">        schema: Schema used to resolve ``keys`` when it is ``None``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -437,7 +437,7 @@
 <div class="viewcode-block" id="InstanceNormalize.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.InstanceNormalize.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Standardize each key using statistics from its own valid positions.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Standardize each key using statistics from its own valid positions."""</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
             <span class="n">_instance_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
@@ -448,7 +448,7 @@
 <div class="viewcode-block" id="PerDatasetNormalize">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.PerDatasetNormalize">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PerDatasetNormalize</span><span class="p">(</span><span class="n">Transform</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standardize each sample by **its source dataset&#39;s** own ``(mean, std)`` stats.</span>
+<span class="w">    </span><span class="sd">"""Standardize each sample by **its source dataset's** own ``(mean, std)`` stats.</span>
 
 <span class="sd">    The remedy for cross-corpus domain shift when training jointly on several</span>
 <span class="sd">    datasets that share a feature extractor: each dataset is standardized by its own</span>
@@ -458,44 +458,44 @@
 <span class="sd">    training time, a ``fallback`` governs unknown ids — crucial for deploying on new</span>
 <span class="sd">    sources:</span>
 
-<span class="sd">    * ``&quot;instance&quot;`` — standardize the sample by its own valid statistics (no external</span>
+<span class="sd">    * ``"instance"`` — standardize the sample by its own valid statistics (no external</span>
 <span class="sd">      stats needed; identical at train and inference);</span>
-<span class="sd">    * ``&quot;union&quot;`` — apply the pooled ``union_stats`` (a neutral default);</span>
-<span class="sd">    * ``&quot;identity&quot;`` — leave the sample unchanged.</span>
+<span class="sd">    * ``"union"`` — apply the pooled ``union_stats`` (a neutral default);</span>
+<span class="sd">    * ``"identity"`` — leave the sample unchanged.</span>
 
-<span class="sd">    Never guess another dataset&#39;s stats for an unknown source — that would inject that</span>
-<span class="sd">    corpus&#39;s shift. Runs in both training and evaluation.</span>
+<span class="sd">    Never guess another dataset's stats for an unknown source — that would inject that</span>
+<span class="sd">    corpus's shift. Runs in both training and evaluation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stats: Mapping of dataset name to a per-key stats mapping (each an</span>
-<span class="sd">            ``(mean, std)`` pair or a mapping with ``&quot;mean&quot;``/``&quot;std&quot;``).</span>
+<span class="sd">            ``(mean, std)`` pair or a mapping with ``"mean"``/``"std"``).</span>
 <span class="sd">        fallback: Policy for a sample whose dataset id is not in ``stats``.</span>
-<span class="sd">        union_stats: Pooled per-key stats, required when ``fallback=&quot;union&quot;``.</span>
-<span class="sd">        dataset_key: Metadata key holding each sample&#39;s source-dataset name.</span>
+<span class="sd">        union_stats: Pooled per-key stats, required when ``fallback="union"``.</span>
+<span class="sd">        dataset_key: Metadata key holding each sample's source-dataset name.</span>
 <span class="sd">        eps: Small constant added to the divisor.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If ``fallback`` is unknown, or ``&quot;union&quot;`` without ``union_stats``.</span>
+<span class="sd">        ValueError: If ``fallback`` is unknown, or ``"union"`` without ``union_stats``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">train_only</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">_fields</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">)</span>
+    <span class="n">_fields</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"mean"</span><span class="p">,</span> <span class="s2">"std"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">stats</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
-        <span class="n">fallback</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;instance&quot;</span><span class="p">,</span>
+        <span class="n">fallback</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"instance"</span><span class="p">,</span>
         <span class="n">union_stats</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dataset&quot;</span><span class="p">,</span>
+        <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"dataset"</span><span class="p">,</span>
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">fallback</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;instance&quot;</span><span class="p">,</span> <span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="s2">&quot;identity&quot;</span><span class="p">}:</span>
+        <span class="k">if</span> <span class="n">fallback</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"instance"</span><span class="p">,</span> <span class="s2">"union"</span><span class="p">,</span> <span class="s2">"identity"</span><span class="p">}:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;fallback must be &#39;instance&#39;, &#39;union&#39; or &#39;identity&#39;, got </span><span class="si">{</span><span class="n">fallback</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"fallback must be 'instance', 'union' or 'identity', got </span><span class="si">{</span><span class="n">fallback</span><span class="si">!r}</span><span class="s2">"</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">fallback</span> <span class="o">==</span> <span class="s2">&quot;union&quot;</span> <span class="ow">and</span> <span class="n">union_stats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fallback=&#39;union&#39; requires union_stats&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fallback</span> <span class="o">==</span> <span class="s2">"union"</span> <span class="ow">and</span> <span class="n">union_stats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"fallback='union' requires union_stats"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">_parse_pair</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">per</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">per</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
@@ -514,7 +514,7 @@
 <div class="viewcode-block" id="PerDatasetNormalize.apply">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/normalize/index.html#omniloader.transforms.normalize.PerDatasetNormalize.apply">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Sample</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sample</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize ``sample`` by its dataset&#39;s stats, or the fallback if unknown.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Normalize ``sample`` by its dataset's stats, or the fallback if unknown."""</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_key</span><span class="p">)</span>
         <span class="n">per</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">per</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -522,16 +522,16 @@
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                     <span class="n">_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
-        <span class="c1"># Unknown source: apply the configured fallback (never another dataset&#39;s stats).</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span> <span class="o">==</span> <span class="s2">&quot;identity&quot;</span><span class="p">:</span>
+        <span class="c1"># Unknown source: apply the configured fallback (never another dataset's stats).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span> <span class="o">==</span> <span class="s2">"identity"</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span> <span class="o">==</span> <span class="s2">&quot;union&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span> <span class="o">==</span> <span class="s2">"union"</span><span class="p">:</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">union</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># guaranteed by __init__ validation</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">union</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                     <span class="n">_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keys</span><span class="p">:</span>  <span class="c1"># fallback == &quot;instance&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keys</span><span class="p">:</span>  <span class="c1"># fallback == "instance"</span>
             <span class="n">_instance_affine</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 </div>

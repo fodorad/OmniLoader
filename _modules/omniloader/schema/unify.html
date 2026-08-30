@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.schema.unify</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Turn heterogeneous raw samples into one unified, masked format.</span>
+<span></span><span class="sd">"""Turn heterogeneous raw samples into one unified, masked format.</span>
 
 <span class="sd">:class:`SampleUnifier` maps any raw sample dict onto the full union of features</span>
 <span class="sd">and targets described by a :class:`~omniloader.schema.spec.UnifiedSchema`. Keys the</span>
@@ -290,7 +290,7 @@
 <span class="sd">so downstream code can distinguish real data from padding or placeholders. The</span>
 <span class="sd">module is modality- and model-agnostic: it only ever reasons about vectors and</span>
 <span class="sd">sequences.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -306,11 +306,11 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">omniloader.schema.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorSpec</span><span class="p">,</span> <span class="n">UnifiedSchema</span>
 
 <span class="c1">#: Metadata keys copied verbatim from the raw sample when present.</span>
-<span class="n">METADATA_KEYS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;subset&quot;</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">)</span>
+<span class="n">METADATA_KEYS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"dataset"</span><span class="p">,</span> <span class="s2">"subset"</span><span class="p">,</span> <span class="s2">"key"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_as_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce a raw value to a tensor of the given dtype.</span>
+<span class="w">    </span><span class="sd">"""Coerce a raw value to a tensor of the given dtype.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: Raw value from the source sample (tensor, array, or scalar).</span>
@@ -319,7 +319,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A tensor cast to ``dtype``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
@@ -328,7 +328,7 @@
 <div class="viewcode-block" id="SampleUnifier">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/unify/index.html#omniloader.schema.unify.SampleUnifier">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SampleUnifier</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map raw sample dicts onto a shared, fully-masked schema.</span>
+<span class="w">    </span><span class="sd">"""Map raw sample dicts onto a shared, fully-masked schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema: The unified schema describing every feature and target.</span>
@@ -337,7 +337,7 @@
 <span class="sd">            :func:`~omniloader.utils.padding.pad_or_crop_time_dim`. When ``False``,</span>
 <span class="sd">            values are assumed to already match and are copied as-is.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">UnifiedSchema</span><span class="p">,</span> <span class="n">pad_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
@@ -346,17 +346,17 @@
 <div class="viewcode-block" id="SampleUnifier.__call__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/schema/unify/index.html#omniloader.schema.unify.SampleUnifier.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unify a single raw sample.</span>
+<span class="w">        </span><span class="sd">"""Unify a single raw sample.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            sample: Raw sample dict. May contain any subset of the schema&#39;s</span>
+<span class="sd">            sample: Raw sample dict. May contain any subset of the schema's</span>
 <span class="sd">                keys plus optional ``&lt;name&gt;_mask`` entries and metadata.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A dict holding, for every schema key, the value tensor and its</span>
 <span class="sd">            ``&lt;name&gt;_mask``, plus any metadata found in the source sample.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">METADATA_KEYS</span><span class="p">:</span>
@@ -366,7 +366,7 @@
         <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">specs</span><span class="p">:</span>
             <span class="n">value</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
             <span class="n">out</span><span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-            <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span>
+            <span class="n">out</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
 
@@ -374,22 +374,22 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="n">TensorSpec</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the value and mask for one spec.</span>
+<span class="w">        </span><span class="sd">"""Resolve the value and mask for one spec.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            spec: The feature or target spec to resolve.</span>
 <span class="sd">            sample: The raw sample being unified.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple of ``(value, mask)`` tensors matching the spec&#39;s shapes.</span>
+<span class="sd">            Tuple of ``(value, mask)`` tensors matching the spec's shapes.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="c1"># Missing key -&gt; placeholder value + all-False mask.</span>
             <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">placeholder_value</span><span class="p">(),</span> <span class="n">spec</span><span class="o">.</span><span class="n">placeholder_mask</span><span class="p">()</span>
 
         <span class="n">value</span> <span class="o">=</span> <span class="n">_as_tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">spec</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-        <span class="n">supplied_mask</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">)</span>
+        <span class="n">supplied_mask</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">spec</span><span class="o">.</span><span class="n">is_sequence</span><span class="p">:</span>
             <span class="c1"># Vector/scalar: mask is a single flag (shape ()) for the whole value.</span>

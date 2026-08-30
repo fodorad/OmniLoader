@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.data.factory</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Build datasets and schemas from declarative config entries.</span>
+<span></span><span class="sd">"""Build datasets and schemas from declarative config entries.</span>
 
 <span class="sd">This lets datasets be described in JSON/YAML (adapter + constructor args +</span>
 <span class="sd">schema) so tools like the CLI and :class:`~omniloader.config.OmniConfig` can</span>
@@ -290,20 +290,20 @@
 <span class="sd">A dataset entry looks like::</span>
 
 <span class="sd">    {</span>
-<span class="sd">      &quot;adapter&quot;: &quot;hdf5&quot;,</span>
-<span class="sd">      &quot;args&quot;: {&quot;h5_path&quot;: &quot;data/mosei.h5&quot;, &quot;subset&quot;: &quot;train&quot;},</span>
-<span class="sd">      &quot;schema&quot;: {</span>
-<span class="sd">        &quot;features&quot;: [</span>
-<span class="sd">          {&quot;name&quot;: &quot;video&quot;, &quot;feature_dim&quot;: 1024, &quot;time_dim&quot;: 300},</span>
-<span class="sd">          {&quot;name&quot;: &quot;eye_image&quot;, &quot;shape&quot;: [3, 64, 64], &quot;time_dim&quot;: 15}</span>
+<span class="sd">      "adapter": "hdf5",</span>
+<span class="sd">      "args": {"h5_path": "data/mosei.h5", "subset": "train"},</span>
+<span class="sd">      "schema": {</span>
+<span class="sd">        "features": [</span>
+<span class="sd">          {"name": "video", "feature_dim": 1024, "time_dim": 300},</span>
+<span class="sd">          {"name": "eye_image", "shape": [3, 64, 64], "time_dim": 15}</span>
 <span class="sd">        ],</span>
-<span class="sd">        &quot;targets&quot;: [{&quot;name&quot;: &quot;sentiment&quot;, &quot;placeholder&quot;: -5.0}]</span>
+<span class="sd">        "targets": [{"name": "sentiment", "placeholder": -5.0}]</span>
 <span class="sd">      }</span>
 <span class="sd">    }</span>
 
 <span class="sd">``shape`` declares a structured (e.g. image) trailing shape instead of a flat</span>
 <span class="sd">feature vector; see :class:`~omniloader.schema.spec.TensorSpec`.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -320,18 +320,18 @@
 
 <span class="c1">#: Registry mapping adapter names to dataset classes.</span>
 <span class="n">ADAPTERS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;hdf5&quot;</span><span class="p">:</span> <span class="n">HDF5Dataset</span><span class="p">,</span>
-    <span class="s2">&quot;npy&quot;</span><span class="p">:</span> <span class="n">NpyFolderDataset</span><span class="p">,</span>
+    <span class="s2">"hdf5"</span><span class="p">:</span> <span class="n">HDF5Dataset</span><span class="p">,</span>
+    <span class="s2">"npy"</span><span class="p">:</span> <span class="n">NpyFolderDataset</span><span class="p">,</span>
 <span class="p">}</span>
 
 
 <div class="viewcode-block" id="schema_from_dict">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/factory/index.html#omniloader.data.factory.schema_from_dict">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">schema_from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DatasetSchema</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a :class:`DatasetSchema` from a ``{&quot;features&quot;: [...], &quot;targets&quot;: [...]}`` dict.</span>
+<span class="w">    </span><span class="sd">"""Build a :class:`DatasetSchema` from a ``{"features": [...], "targets": [...]}`` dict.</span>
 
 <span class="sd">    Each spec dict is forwarded to :class:`TensorSpec`/:class:`TensorSpec`; the</span>
-<span class="sd">    ``dtype`` field may be a string name (e.g. ``&quot;int64&quot;``).</span>
+<span class="sd">    ``dtype`` field may be a string name (e.g. ``"int64"``).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: The schema mapping.</span>
@@ -339,10 +339,10 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The constructed schema.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">DatasetSchema</span><span class="p">(</span>
-        <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">(</span><span class="o">**</span><span class="n">spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">,</span> <span class="p">[])],</span>
-        <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">(</span><span class="o">**</span><span class="n">spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;targets&quot;</span><span class="p">,</span> <span class="p">[])],</span>
+        <span class="n">features</span><span class="o">=</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">(</span><span class="o">**</span><span class="n">spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"features"</span><span class="p">,</span> <span class="p">[])],</span>
+        <span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">TensorSpec</span><span class="p">(</span><span class="o">**</span><span class="n">spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"targets"</span><span class="p">,</span> <span class="p">[])],</span>
     <span class="p">)</span></div>
 
 
@@ -350,7 +350,7 @@
 <div class="viewcode-block" id="build_dataset">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/factory/index.html#omniloader.data.factory.build_dataset">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_dataset</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SizedDataset</span><span class="p">,</span> <span class="n">DatasetSchema</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct one ``(dataset, schema)`` pair from a config entry.</span>
+<span class="w">    </span><span class="sd">"""Construct one ``(dataset, schema)`` pair from a config entry.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        entry: A dict with ``adapter`` (a key of :data:`ADAPTERS`), ``args`` (the</span>
@@ -362,12 +362,12 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``adapter`` is not registered.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;adapter&quot;</span><span class="p">]</span>
+<span class="sd">    """</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">"adapter"</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">adapter</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ADAPTERS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown dataset adapter </span><span class="si">{</span><span class="n">adapter</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ADAPTERS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">ADAPTERS</span><span class="p">[</span><span class="n">adapter</span><span class="p">](</span><span class="o">**</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="p">{}))</span>
-    <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">schema_from_dict</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;schema&quot;</span><span class="p">])</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown dataset adapter </span><span class="si">{</span><span class="n">adapter</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ADAPTERS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">ADAPTERS</span><span class="p">[</span><span class="n">adapter</span><span class="p">](</span><span class="o">**</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"args"</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">schema_from_dict</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">"schema"</span><span class="p">])</span></div>
 
 
 
@@ -376,7 +376,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">build_datasets</span><span class="p">(</span>
     <span class="n">entries</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">SizedDataset</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetSchema</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct parallel lists of datasets and schemas from config entries.</span>
+<span class="w">    </span><span class="sd">"""Construct parallel lists of datasets and schemas from config entries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        entries: A list of dataset entries (see :func:`build_dataset`).</span>
@@ -385,7 +385,7 @@
 <span class="sd">        A ``(datasets, schemas)`` tuple ready for</span>
 <span class="sd">        :class:`~omniloader.loader.OmniLoader`.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SizedDataset</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">schemas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DatasetSchema</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>

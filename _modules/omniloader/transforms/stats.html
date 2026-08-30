@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.transforms.stats</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Compute and persist feature normalization statistics over a dataset.</span>
+<span></span><span class="sd">"""Compute and persist feature normalization statistics over a dataset.</span>
 
 <span class="sd">:func:`compute_feature_stats` estimates per-feature ``(mean, std)`` (streaming),</span>
 <span class="sd">while :func:`compute_stats` returns the richer set (mean/std/min/max/median/iqr)</span>
@@ -291,7 +291,7 @@
 <span class="sd">(``{dataset: {key: {...}}}``) form through JSON. All are modality-agnostic: they</span>
 <span class="sd">accumulate over the trailing feature axis of both vectors and sequences, counting</span>
 <span class="sd">only valid (unmasked) positions.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -313,7 +313,7 @@
     <span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate per-feature ``(mean, std)`` for each key over valid positions.</span>
+<span class="w">    </span><span class="sd">"""Estimate per-feature ``(mean, std)`` for each key over valid positions.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        samples: An iterable of unified sample dicts (e.g. an</span>
@@ -329,7 +329,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a key never has any valid position across the samples.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Running sums per key: count of valid rows, sum and sum-of-squares over them.</span>
     <span class="n">count</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
     <span class="n">total</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -340,7 +340,7 @@
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># (T, F) | (F,) | (T,) | ()</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span>
             <span class="n">rows</span><span class="p">,</span> <span class="n">feat</span> <span class="o">=</span> <span class="n">_valid_rows</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>  <span class="c1"># rows: (N, F) | (N,), N valid positions</span>
             <span class="k">if</span> <span class="n">rows</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -356,7 +356,7 @@
     <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">count</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no valid positions to compute statistics&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no valid positions to compute statistics"</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">mean</span> <span class="o">=</span> <span class="n">total</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">/</span> <span class="n">n</span>
         <span class="n">var</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">total_sq</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">/</span> <span class="n">n</span> <span class="o">-</span> <span class="n">mean</span> <span class="o">*</span> <span class="n">mean</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -373,7 +373,7 @@
     <span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the full statistic set per key, feeding every normalizer variant.</span>
+<span class="w">    </span><span class="sd">"""Compute the full statistic set per key, feeding every normalizer variant.</span>
 
 <span class="sd">    Unlike :func:`compute_feature_stats`, this collects all valid positions (to</span>
 <span class="sd">    compute median/IQR), so it uses more memory; run it once and persist with</span>
@@ -385,26 +385,26 @@
 <span class="sd">        eps: Lower bound for ``std`` and ``iqr`` to avoid zeros.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Mapping of key to ``{&quot;mean&quot;, &quot;std&quot;, &quot;min&quot;, &quot;max&quot;, &quot;median&quot;, &quot;iqr&quot;}``</span>
+<span class="sd">        Mapping of key to ``{"mean", "std", "min", "max", "median", "iqr"}``</span>
 <span class="sd">        tensors of shape ``(F,)`` (or ``()`` for scalar sequences).</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a key never has any valid position across the samples.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">collected</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">rows</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_valid_rows</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">])</span>
+            <span class="n">rows</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_valid_rows</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">rows</span><span class="o">.</span><span class="n">numel</span><span class="p">():</span>
                 <span class="n">collected</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
     <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">collected</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no valid positions to compute statistics&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Key </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> has no valid positions to compute statistics"</span><span class="p">)</span>
         <span class="n">stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_reduce_stats</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">collected</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">eps</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">stats</span></div>
 
@@ -415,46 +415,46 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_dataset_stats</span><span class="p">(</span>
     <span class="n">samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">keys</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dataset&quot;</span><span class="p">,</span>
+    <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"dataset"</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the full statistic set per key, **grouped by source dataset**.</span>
+<span class="w">    </span><span class="sd">"""Compute the full statistic set per key, **grouped by source dataset**.</span>
 
 <span class="sd">    Feeds :class:`~omniloader.transforms.normalize.PerDatasetNormalize`: each source</span>
 <span class="sd">    dataset (identified by the ``dataset`` metadata key every unified sample carries)</span>
 <span class="sd">    gets its own statistics, so datasets can be standardized by their own mean/std</span>
 <span class="sd">    rather than a pooled estimate. As with :func:`compute_stats`, only valid</span>
 <span class="sd">    (unmasked) positions contribute. Keys a dataset never provides are simply absent</span>
-<span class="sd">    from that dataset&#39;s stats.</span>
+<span class="sd">    from that dataset's stats.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        samples: An iterable of unified sample dicts (e.g. an</span>
 <span class="sd">            :class:`~omniloader.loader.OmniLoader`). Each must carry ``dataset_key``.</span>
 <span class="sd">        keys: The feature keys to compute statistics for.</span>
-<span class="sd">        dataset_key: Metadata key holding each sample&#39;s source-dataset name.</span>
+<span class="sd">        dataset_key: Metadata key holding each sample's source-dataset name.</span>
 <span class="sd">        eps: Lower bound for ``std`` and ``iqr`` to avoid zeros.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Mapping of dataset name to a stats mapping (``{key: {&quot;mean&quot;, &quot;std&quot;, ...}}``),</span>
-<span class="sd">        matching :func:`compute_stats`&#39;s per-key shape.</span>
+<span class="sd">        Mapping of dataset name to a stats mapping (``{key: {"mean", "std", ...}}``),</span>
+<span class="sd">        matching :func:`compute_stats`'s per-key shape.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If a sample lacks ``dataset_key`` (required to group by dataset).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">collected</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dataset_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;compute_dataset_stats requires a </span><span class="si">{</span><span class="n">dataset_key</span><span class="si">!r}</span><span class="s2"> metadata key on every &quot;</span>
-                <span class="s2">&quot;sample; none was found. Per-dataset normalization needs dataset provenance.&quot;</span>
+                <span class="sa">f</span><span class="s2">"compute_dataset_stats requires a </span><span class="si">{</span><span class="n">dataset_key</span><span class="si">!r}</span><span class="s2"> metadata key on every "</span>
+                <span class="s2">"sample; none was found. Per-dataset normalization needs dataset provenance."</span>
             <span class="p">)</span>
         <span class="n">bucket</span> <span class="o">=</span> <span class="n">collected</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">})</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">rows</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_valid_rows</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">])</span>
+            <span class="n">rows</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_valid_rows</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">rows</span><span class="o">.</span><span class="n">numel</span><span class="p">():</span>
                 <span class="n">bucket</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
@@ -470,32 +470,32 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_stats</span><span class="p">(</span><span class="n">rows</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reduce stacked valid rows to the full statistic set.</span>
+<span class="w">    </span><span class="sd">"""Reduce stacked valid rows to the full statistic set.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        rows: Valid positions of shape ``(N, F)`` or ``(N,)``.</span>
 <span class="sd">        eps: Lower bound for ``std`` and ``iqr``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Mapping ``{&quot;mean&quot;, &quot;std&quot;, &quot;min&quot;, &quot;max&quot;, &quot;median&quot;, &quot;iqr&quot;}`` of shape ``(F,)``</span>
+<span class="sd">        Mapping ``{"mean", "std", "min", "max", "median", "iqr"}`` of shape ``(F,)``</span>
 <span class="sd">        (or ``()`` for scalar sequences).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (3, F) or (3,)</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">),</span>
-        <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="s2">&quot;iqr&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">),</span>
+        <span class="s2">"mean"</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">"std"</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">),</span>
+        <span class="s2">"min"</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">"max"</span><span class="p">:</span> <span class="n">rows</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">"median"</span><span class="p">:</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">"iqr"</span><span class="p">:</span> <span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">),</span>
     <span class="p">}</span>
 
 
 <div class="viewcode-block" id="save_stats">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/stats/index.html#omniloader.transforms.stats.save_stats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">save_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a stats mapping to JSON (tensors are stored as nested lists).</span>
+<span class="w">    </span><span class="sd">"""Save a stats mapping to JSON (tensors are stored as nested lists).</span>
 
 <span class="sd">    Handles both the flat form from :func:`compute_stats` (``{key: {field: tensor}}``)</span>
 <span class="sd">    and the nested per-dataset form from :func:`compute_dataset_stats`</span>
@@ -505,15 +505,15 @@
 <span class="sd">        stats: A stats mapping.</span>
 <span class="sd">        path: Destination ``.json`` file.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_to_serializable</span><span class="p">(</span><span class="n">stats</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+<span class="sd">    """</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_to_serializable</span><span class="p">(</span><span class="n">stats</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="load_stats">
 <a class="viewcode-back" href="../../../autoapi/omniloader/transforms/stats/index.html#omniloader.transforms.stats.load_stats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">load_stats</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a stats mapping saved by :func:`save_stats`, restoring float tensors.</span>
+<span class="w">    </span><span class="sd">"""Load a stats mapping saved by :func:`save_stats`, restoring float tensors.</span>
 
 <span class="sd">    Restores either the flat or the nested per-dataset form (mirroring</span>
 <span class="sd">    :func:`save_stats`).</span>
@@ -524,13 +524,13 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The stats mapping with leaf lists restored to float tensors.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_from_serializable</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)))</span></div>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">_from_serializable</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)))</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_to_serializable</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively turn tensors into lists, preserving the mapping structure.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Recursively turn tensors into lists, preserving the mapping structure."""</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
@@ -539,14 +539,14 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_from_serializable</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively turn leaf lists/numbers back into float tensors.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Recursively turn leaf lists/numbers back into float tensors."""</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">_from_serializable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_valid_rows</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Flatten a value to its valid positions and report the feature shape.</span>
+<span class="w">    </span><span class="sd">"""Flatten a value to its valid positions and report the feature shape.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: A value of shape ``()``, ``(F,)``, ``(T,)`` or ``(T, F)``.</span>
@@ -557,7 +557,7 @@
 <span class="sd">        positions (shape ``(N, F)`` or ``(N,)``) and ``feature_shape`` is the</span>
 <span class="sd">        trailing feature shape (``(F,)`` or ``()``).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># Vector/scalar: one position, valid iff the single flag is True.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>

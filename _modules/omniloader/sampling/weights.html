@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.sampling.weights</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Class-balance helpers for categorical targets.</span>
+<span></span><span class="sd">"""Class-balance helpers for categorical targets.</span>
 
 <span class="sd">Two complementary tools, named for what consumes their output, both counting only</span>
 <span class="sd">valid (unmasked) target positions:</span>
@@ -297,7 +297,7 @@
 <span class="sd">Unlike the per-sample sampler weights, the histogram/loss weights count **every valid</span>
 <span class="sd">labelled position** (each valid step of a framewise ``(T,)`` target, or the scalar of a</span>
 <span class="sd">vector target), matching what a per-position loss actually sees.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -311,7 +311,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_sample_class</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the representative class id of a sample, or ``None`` if invalid.</span>
+<span class="w">    </span><span class="sd">"""Return the representative class id of a sample, or ``None`` if invalid.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: A scalar class id ``()`` or a per-step class sequence ``(T,)``.</span>
@@ -321,7 +321,7 @@
 <span class="sd">        The class id (the value for a scalar, the most common valid step for a</span>
 <span class="sd">        sequence), or ``None`` when nothing is valid.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -339,7 +339,7 @@
     <span class="n">samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span>
     <span class="n">target_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute per-sample inverse-class-frequency weights for a *sampler*.</span>
+<span class="w">    </span><span class="sd">"""Compute per-sample inverse-class-frequency weights for a *sampler*.</span>
 
 <span class="sd">    Feed the result to a sampler (e.g.</span>
 <span class="sd">    :class:`~omniloader.sampling.strategies.SubsampleConfig` ``sample_weights``) to</span>
@@ -353,24 +353,24 @@
 <span class="sd">            to skip invalid positions.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A list of per-sample weights (``1 / class_count`` for the sample&#39;s class,</span>
+<span class="sd">        A list of per-sample weights (``1 / class_count`` for the sample's class,</span>
 <span class="sd">        ``0`` when the sample has no valid target), aligned with ``samples``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">classes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_sample_class</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">)))</span>
+            <span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_sample_class</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">target_key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">)))</span>
     <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">counts</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">]</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_valid_class_ids</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the valid class ids of a sample (all valid steps, or the scalar).</span>
+<span class="w">    </span><span class="sd">"""Return the valid class ids of a sample (all valid steps, or the scalar).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value: A scalar class id ``()`` or a per-step class sequence ``(T,)``.</span>
@@ -379,7 +379,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Every valid class id — one for a scalar, one per valid step for a sequence.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[]</span>
@@ -395,7 +395,7 @@
     <span class="n">target_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count valid instances of each class for a categorical target.</span>
+<span class="w">    </span><span class="sd">"""Count valid instances of each class for a categorical target.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        samples: An iterable of unified sample dicts (a source dataset or an</span>
@@ -411,18 +411,18 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If an observed class id is negative or ``&gt;= num_classes``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">counts</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">counts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_valid_class_ids</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">)))</span>
+        <span class="n">counts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_valid_class_ids</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">sample</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">target_key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">)))</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">num_classes</span> <span class="k">if</span> <span class="n">num_classes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">counts</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">hist</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="bp">cls</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">cls</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;class id </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2"> out of range for num_classes=</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"class id </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2"> out of range for num_classes=</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">hist</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
     <span class="k">return</span> <span class="n">hist</span></div>
 
@@ -434,10 +434,10 @@
     <span class="n">samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span>
     <span class="n">target_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">num_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inverse&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"inverse"</span><span class="p">,</span>
     <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.999</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute per-class weights for a *loss* from a categorical target.</span>
+<span class="w">    </span><span class="sd">"""Compute per-class weights for a *loss* from a categorical target.</span>
 
 <span class="sd">    Intended for ``CrossEntropyLoss(weight=...)`` and similar — it *reweights* the</span>
 <span class="sd">    loss instead of resampling the data (the sampler-side counterpart is</span>
@@ -449,28 +449,28 @@
 <span class="sd">        samples: An iterable of unified sample dicts. Iterated once.</span>
 <span class="sd">        target_key: A categorical (int) target name.</span>
 <span class="sd">        num_classes: Number of classes (``None`` infers ``max id + 1``).</span>
-<span class="sd">        scheme: ``&quot;inverse&quot;`` (inverse frequency ``1 / count``) or ``&quot;effective&quot;``</span>
+<span class="sd">        scheme: ``"inverse"`` (inverse frequency ``1 / count``) or ``"effective"``</span>
 <span class="sd">            (effective number of samples, Cui et al. 2019:</span>
 <span class="sd">            ``(1 - beta) / (1 - beta ** count)``).</span>
-<span class="sd">        beta: Re-weighting strength for ``scheme=&quot;effective&quot;`` (closer to ``1`` =</span>
+<span class="sd">        beta: Re-weighting strength for ``scheme="effective"`` (closer to ``1`` =</span>
 <span class="sd">            stronger balancing).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A ``(num_classes,)`` ``float32`` weight tensor.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If ``scheme`` is not ``&quot;inverse&quot;`` or ``&quot;effective&quot;``.</span>
+<span class="sd">        ValueError: If ``scheme`` is not ``"inverse"`` or ``"effective"``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">hist</span> <span class="o">=</span> <span class="n">class_histogram</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">target_key</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">zero</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;inverse&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">"inverse"</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">hist</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">hist</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">zero</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;effective&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">scheme</span> <span class="o">==</span> <span class="s2">"effective"</span><span class="p">:</span>
         <span class="n">effective</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">hist</span><span class="p">)</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">hist</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span> <span class="o">/</span> <span class="n">effective</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mf">1e-12</span><span class="p">),</span> <span class="n">zero</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;scheme must be &#39;inverse&#39; or &#39;effective&#39;, got </span><span class="si">{</span><span class="n">scheme</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scheme must be 'inverse' or 'effective', got </span><span class="si">{</span><span class="n">scheme</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">total</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">raw</span> <span class="o">*</span> <span class="p">(</span><span class="n">hist</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span>  <span class="c1"># average weight ~1 across classes</span>

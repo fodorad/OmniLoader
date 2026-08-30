@@ -280,13 +280,13 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.templates</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Packaged configuration templates shipped with OmniLoader.</span>
+<span></span><span class="sd">"""Packaged configuration templates shipped with OmniLoader.</span>
 
 <span class="sd">The annotated ``config_template.yaml`` lists every option</span>
 <span class="sd">:class:`~omniloader.config.OmniConfig` understands, with defaults and inline</span>
 <span class="sd">guidance. Locate it programmatically with :func:`config_template_path` (e.g. to</span>
 <span class="sd">copy it as a starting point for a new experiment).</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -294,13 +294,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="c1">#: File name of the annotated config template within this package.</span>
-<span class="n">CONFIG_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;config_template.yaml&quot;</span>
+<span class="n">CONFIG_TEMPLATE</span> <span class="o">=</span> <span class="s2">"config_template.yaml"</span>
 
 
 <div class="viewcode-block" id="config_template_path">
 <a class="viewcode-back" href="../../autoapi/omniloader/templates/index.html#omniloader.templates.config_template_path">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">config_template_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the filesystem path to the annotated ``config_template.yaml``.</span>
+<span class="w">    </span><span class="sd">"""Return the filesystem path to the annotated ``config_template.yaml``.</span>
 
 <span class="sd">    The template ships as package data, so this resolves it wherever OmniLoader</span>
 <span class="sd">    is installed (source tree or wheel).</span>
@@ -308,13 +308,13 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The path to the annotated config template.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">with</span> <span class="n">as_file</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="n">__package__</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">CONFIG_TEMPLATE</span><span class="p">))</span> <span class="k">as</span> <span class="n">path</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CONFIG_TEMPLATE&quot;</span><span class="p">,</span> <span class="s2">&quot;config_template_path&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CONFIG_TEMPLATE"</span><span class="p">,</span> <span class="s2">"config_template_path"</span><span class="p">]</span>
 </pre></div>
         </article>
       </div>

@@ -280,16 +280,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.sampling.bucketing</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Length-bucketed batching to minimize padding waste.</span>
+<span></span><span class="sd">"""Length-bucketed batching to minimize padding waste.</span>
 
 <span class="sd">:class:`LengthBucketBatchSampler` wraps an index sampler (e.g.</span>
 <span class="sd">:class:`~omniloader.sampling.sampler.OmniSampler`) and a per-sample length array,</span>
 <span class="sd">and yields *batches* of indices whose sequences have similar length. Used as</span>
 <span class="sd">``DataLoader(batch_sampler=...)`` together with</span>
-<span class="sd">:class:`~omniloader.collate.DynamicCollator`, it keeps each batch&#39;s padded length</span>
+<span class="sd">:class:`~omniloader.collate.DynamicCollator`, it keeps each batch's padded length</span>
 <span class="sd">close to its true length.</span>
 
-<span class="sd">The classic pooling scheme is used: the sampler&#39;s index stream is cut into pools</span>
+<span class="sd">The classic pooling scheme is used: the sampler's index stream is cut into pools</span>
 <span class="sd">of ``batch_size * bucket_multiplier``; each pool is sorted by length and split</span>
 <span class="sd">into batches; the batch order is then shuffled so length still varies across</span>
 <span class="sd">steps (only within-batch length is homogenised).</span>
@@ -298,7 +298,7 @@
 <span class="sd">(``OmniLoader(pad_features=False)`` + :class:`~omniloader.collate.DynamicCollator`).</span>
 <span class="sd">When every sample is padded/cropped to a fixed ``time_dim`` the batches are already</span>
 <span class="sd">equal length, so grouping by length changes no shapes and bucketing is a no-op.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -315,19 +315,19 @@
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.SizedSampler">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SizedSampler</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An index sampler that reports its length (as PyTorch samplers do).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""An index sampler that reports its length (as PyTorch samplers do)."""</span>
 
 <div class="viewcode-block" id="SizedSampler.__iter__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.SizedSampler.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate the sampler&#39;s indices.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Iterate the sampler's indices."""</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="SizedSampler.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.SizedSampler.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of indices produced per epoch.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of indices produced per epoch."""</span>
         <span class="o">...</span></div>
 </div>
 
@@ -336,7 +336,7 @@
 <div class="viewcode-block" id="LengthBucketBatchSampler">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.LengthBucketBatchSampler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LengthBucketBatchSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield batches of indices grouped by sequence length.</span>
+<span class="w">    </span><span class="sd">"""Yield batches of indices grouped by sequence length.</span>
 
 <span class="sd">    Only meaningful in the native-length regime (``pad_features=False`` +</span>
 <span class="sd">    :class:`~omniloader.collate.DynamicCollator`); under a fixed ``time_dim`` all</span>
@@ -346,7 +346,7 @@
 <span class="sd">        sampler: An index sampler yielding global indices (its length defines the</span>
 <span class="sd">            epoch size). If it exposes an ``epoch`` attribute, it seeds the batch</span>
 <span class="sd">            shuffle for reproducibility across epochs.</span>
-<span class="sd">        lengths: Per-index sequence lengths, indexable by the sampler&#39;s indices</span>
+<span class="sd">        lengths: Per-index sequence lengths, indexable by the sampler's indices</span>
 <span class="sd">            (e.g. from :meth:`~omniloader.loader.OmniLoader.sequence_lengths`).</span>
 <span class="sd">        batch_size: Number of samples per batch.</span>
 <span class="sd">        bucket_multiplier: Pool size in batches; larger pools bucket more tightly</span>
@@ -358,7 +358,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``batch_size`` or ``bucket_multiplier`` is not positive.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -371,7 +371,7 @@
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">batch_size</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">bucket_multiplier</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;batch_size and bucket_multiplier must be positive&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"batch_size and bucket_multiplier must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="n">sampler</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -381,7 +381,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build this epoch&#39;s batches: pool, sort by length, split.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Build this epoch's batches: pool, sort by length, split."""</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">)</span>
         <span class="n">pool_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bucket_multiplier</span>
         <span class="n">batches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -397,10 +397,10 @@
 <div class="viewcode-block" id="LengthBucketBatchSampler.__iter__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.LengthBucketBatchSampler.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate length-bucketed batches for the current epoch.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Iterate length-bucketed batches for the current epoch."""</span>
         <span class="n">batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batches</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle</span><span class="p">:</span>
-            <span class="n">epoch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="s2">&quot;epoch&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">epoch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="s2">"epoch"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
             <span class="n">gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span>
             <span class="n">gen</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">+</span> <span class="n">epoch</span><span class="p">)</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">),</span> <span class="n">generator</span><span class="o">=</span><span class="n">gen</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -411,7 +411,7 @@
 <div class="viewcode-block" id="LengthBucketBatchSampler.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/bucketing/index.html#omniloader.sampling.bucketing.LengthBucketBatchSampler.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of batches produced per epoch.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of batches produced per epoch."""</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">n</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>

@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.data.npy</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;A dataset over a per-sample ``.npy`` folder layout.</span>
+<span></span><span class="sd">"""A dataset over a per-sample ``.npy`` folder layout.</span>
 
 <span class="sd">:class:`NpyFolderDataset` reads the common feature-extraction layout where each</span>
 <span class="sd">sample is a directory of ``.npy`` files, one per named value::</span>
@@ -292,10 +292,10 @@
 <span class="sd">        valence.npy</span>
 <span class="sd">        ...</span>
 
-<span class="sd">Arrays are memory-mapped (``mmap_mode=&quot;r&quot;``) so large features are not copied into</span>
+<span class="sd">Arrays are memory-mapped (``mmap_mode="r"``) so large features are not copied into</span>
 <span class="sd">RAM until sliced. Every sample directory is expected to contain the same set of</span>
 <span class="sd">files; the first sample defines the key set unless ``keys`` is given.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -313,7 +313,7 @@
 <div class="viewcode-block" id="NpyFolderDataset">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/npy/index.html#omniloader.data.npy.NpyFolderDataset">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NpyFolderDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read samples from a directory of per-sample ``.npy`` sub-folders.</span>
+<span class="w">    </span><span class="sd">"""Read samples from a directory of per-sample ``.npy`` sub-folders.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        root: Directory whose immediate sub-directories are samples.</span>
@@ -325,7 +325,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        FileNotFoundError: If ``root`` has no sample sub-directories.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -337,24 +337,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mmap</span> <span class="o">=</span> <span class="n">mmap</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">())</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No sample sub-directories found under </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No sample sub-directories found under </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.npy&quot;</span><span class="p">))</span>
+            <span class="k">else</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.npy"</span><span class="p">))</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="NpyFolderDataset.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/npy/index.html#omniloader.data.npy.NpyFolderDataset.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of sample directories.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of sample directories."""</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NpyFolderDataset.__getitem__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/data/npy/index.html#omniloader.data.npy.NpyFolderDataset.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the sample at ``index`` as a dict of tensors plus its key.</span>
+<span class="w">        </span><span class="sd">"""Load the sample at ``index`` as a dict of tensors plus its key.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index: Sample position.</span>
@@ -363,14 +363,14 @@
 <span class="sd">            A dict mapping each key to a tensor, plus a ``key`` metadata string</span>
 <span class="sd">            (the sample directory name).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">sample_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_dirs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="n">sample</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">sample_dir</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="n">sample</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"key"</span><span class="p">:</span> <span class="n">sample_dir</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">sample_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.npy&quot;</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">sample_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.npy"</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                 <span class="k">continue</span>
-            <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmap</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">"r"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmap</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
             <span class="c1"># Copy out of the (read-only) memmap so the tensor owns writable memory.</span>
             <span class="n">sample</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sample</span></div>

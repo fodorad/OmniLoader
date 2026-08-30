@@ -280,18 +280,18 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.sampling.sampler</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;A ``Sampler`` that turns a mixing strategy into a per-epoch index stream.</span>
+<span></span><span class="sd">"""A ``Sampler`` that turns a mixing strategy into a per-epoch index stream.</span>
 
 <span class="sd">:class:`OmniSampler` is the bridge between a</span>
-<span class="sd">:class:`~omniloader.sampling.strategies.MixingStrategy` and PyTorch&#39;s ``DataLoader``.</span>
+<span class="sd">:class:`~omniloader.sampling.strategies.MixingStrategy` and PyTorch's ``DataLoader``.</span>
 <span class="sd">Each epoch it asks the strategy for the global indices to visit; call</span>
 <span class="sd">:meth:`OmniSampler.set_epoch` before every epoch to advance the reproducible draw.</span>
 
 <span class="sd">It is **distributed-aware**: when ``num_replicas``/``rank`` are given (or inferred</span>
-<span class="sd">from an initialized ``torch.distributed`` process group) it shards the epoch&#39;s</span>
+<span class="sd">from an initialized ``torch.distributed`` process group) it shards the epoch's</span>
 <span class="sd">indices across replicas so each rank sees a disjoint slice, mirroring</span>
 <span class="sd">``torch.utils.data.DistributedSampler``.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -307,7 +307,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_dist</span><span class="p">(</span><span class="n">num_replicas</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve ``(num_replicas, rank)``, inferring from ``torch.distributed``.</span>
+<span class="w">    </span><span class="sd">"""Resolve ``(num_replicas, rank)``, inferring from ``torch.distributed``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        num_replicas: Explicit replica count, or ``None`` to infer.</span>
@@ -319,33 +319,33 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``rank`` is outside ``[0, num_replicas)``.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">num_replicas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">num_replicas</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span> <span class="k">if</span> <span class="n">dist</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dist</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">()</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rank</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span> <span class="k">if</span> <span class="n">dist</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">dist</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">num_replicas</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">num_replicas</span><span class="si">}</span><span class="s2"> replicas&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> out of range for </span><span class="si">{</span><span class="n">num_replicas</span><span class="si">}</span><span class="s2"> replicas"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">num_replicas</span><span class="p">,</span> <span class="n">rank</span>
 
 
 <div class="viewcode-block" id="OmniSampler">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/sampler/index.html#omniloader.sampling.sampler.OmniSampler">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OmniSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield global indices for one epoch according to a mixing strategy.</span>
+<span class="w">    </span><span class="sd">"""Yield global indices for one epoch according to a mixing strategy.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        strategy: The mixing strategy that computes the epoch&#39;s index list.</span>
+<span class="sd">        strategy: The mixing strategy that computes the epoch's index list.</span>
 <span class="sd">        epoch: Initial epoch number.</span>
 <span class="sd">        num_replicas: Number of distributed replicas. ``None`` infers from</span>
 <span class="sd">            ``torch.distributed`` (or ``1`` when not distributed).</span>
-<span class="sd">        rank: This process&#39;s replica index. ``None`` infers from</span>
+<span class="sd">        rank: This process's replica index. ``None`` infers from</span>
 <span class="sd">            ``torch.distributed`` (or ``0``).</span>
 <span class="sd">        drop_last: When sharding, drop the tail so every rank gets exactly the</span>
 <span class="sd">            same number of samples. When ``False`` (default), the index list is</span>
 <span class="sd">            padded by wrapping so no sample is skipped.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -363,17 +363,17 @@
 <div class="viewcode-block" id="OmniSampler.set_epoch">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/sampler/index.html#omniloader.sampling.sampler.OmniSampler.set_epoch">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the epoch used to seed the next iteration.</span>
+<span class="w">        </span><span class="sd">"""Set the epoch used to seed the next iteration.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            epoch: The upcoming epoch number.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">epoch</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_shard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this rank&#39;s slice of ``indices`` (identity when single-process).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return this rank's slice of ``indices`` (identity when single-process)."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_replicas</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">indices</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span><span class="p">:</span>
@@ -388,14 +388,14 @@
 <div class="viewcode-block" id="OmniSampler.__iter__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/sampler/index.html#omniloader.sampling.sampler.OmniSampler.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate this rank&#39;s global indices for the current epoch.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Iterate this rank's global indices for the current epoch."""</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shard</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">epoch_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch</span><span class="p">)))</span></div>
 
 
 <div class="viewcode-block" id="OmniSampler.__len__">
 <a class="viewcode-back" href="../../../autoapi/omniloader/sampling/sampler/index.html#omniloader.sampling.sampler.OmniSampler.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of indices this rank produces per epoch.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of indices this rank produces per epoch."""</span>
         <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_replicas</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">total</span>

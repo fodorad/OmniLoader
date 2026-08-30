@@ -292,14 +292,16 @@
 <p><a class="reference internal" href="#omniloader.utils.seeding.seed_worker" title="omniloader.utils.seeding.seed_worker"><code class="xref py py-func docutils literal notranslate"><span class="pre">seed_worker()</span></code></a> is a <code class="docutils literal notranslate"><span class="pre">DataLoader(worker_init_fn=...)</span></code> callback that gives
 each worker process a deterministic, distinct RNG state derived from PyTorch’s
 per-worker seed, so any randomness that falls back to the global NumPy/Python/torch
-RNGs (rather than an explicit <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Generator</span></code>) is reproducible.</p>
+RNGs (rather than an explicit <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.Generator</span></code>) is reproducible. It also
+resets any HDF5-backed dataset reachable from the worker’s dataset, since HDF5
+handles are not fork-safe (see <a class="reference internal" href="../../data/datasets/index.html#omniloader.data.datasets.HDF5Dataset.reset_for_worker" title="omniloader.data.datasets.HDF5Dataset.reset_for_worker"><code class="xref py py-meth docutils literal notranslate"><span class="pre">omniloader.data.datasets.HDF5Dataset.reset_for_worker()</span></code></a>).</p>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.utils.seeding.seed_worker" title="omniloader.utils.seeding.seed_worker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed_worker</span></code></a>(→ None)</p></td>
-<td><p>Seed a DataLoader worker's Python, NumPy and torch RNGs deterministically.</p></td>
+<td><p>Seed a DataLoader worker's RNGs and give it its own HDF5 handles.</p></td>
 </tr>
 </tbody>
 </table>
@@ -310,10 +312,16 @@ RNGs (rather than an explicit <code class="xref py py-class docutils literal not
 <dl class="py function">
 <dt class="sig sig-object py" id="omniloader.utils.seeding.seed_worker">
 <span class="sig-prename descclassname"><span class="pre">omniloader.utils.seeding.</span></span><span class="sig-name descname"><span class="pre">seed_worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">worker_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../../../_modules/omniloader/utils/seeding.html#seed_worker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omniloader.utils.seeding.seed_worker" title="Link to this definition">¶</a></dt>
-<dd><p>Seed a DataLoader worker’s Python, NumPy and torch RNGs deterministically.</p>
+<dd><p>Seed a DataLoader worker’s RNGs and give it its own HDF5 handles.</p>
 <p>Pass as <code class="docutils literal notranslate"><span class="pre">DataLoader(worker_init_fn=seed_worker)</span></code>. PyTorch already sets a
 distinct <code class="docutils literal notranslate"><span class="pre">torch.initial_seed()</span></code> per worker (derived from the base seed and
 worker id); this propagates it to the other RNGs.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">fork</span></code>-started worker (the default on Linux/macOS) also inherits
+whatever HDF5 file handles were already open in the parent process, and
+those handles are not fork-safe — reading them from more than one process
+hangs rather than raising. This clears any such handle so the lazy reopen
+happens inside the worker, as intended by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">omniloader.data.datasets.HDF5Dataset._handle()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>worker_id</strong> – The worker index supplied by the DataLoader (unused; the seed

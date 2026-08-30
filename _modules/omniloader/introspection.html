@@ -280,7 +280,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for omniloader.introspection</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Introspection helpers: describe a dataset mix and validate it against specs.</span>
+<span></span><span class="sd">"""Introspection helpers: describe a dataset mix and validate it against specs.</span>
 
 <span class="sd">:func:`describe` summarises a collection of datasets — the union schema, which</span>
 <span class="sd">dataset provides which key (the *coverage matrix*), the fraction of valid (non-</span>
@@ -288,7 +288,7 @@
 <span class="sd">:func:`validate` dry-runs each dataset, checking that the raw samples it emits</span>
 <span class="sd">match the shape and rank their :class:`~omniloader.schema.spec.TensorSpec`</span>
 <span class="sd">declares — catching schema/data mismatches before training starts.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -307,19 +307,19 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">SizedDataset</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Best-effort name for a dataset: its ``dataset`` metadata or ``dataset_&lt;i&gt;``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Best-effort name for a dataset: its ``dataset`` metadata or ``dataset_&lt;i&gt;``."""</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>  <span class="c1"># type: ignore[arg-type]</span>
-        <span class="n">meta</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dataset"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">meta</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;dataset_</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"dataset_</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">"</span>
 
 
 <div class="viewcode-block" id="Report">
 <a class="viewcode-back" href="../../autoapi/omniloader/introspection/index.html#omniloader.introspection.Report">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Report</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A human-readable summary of a dataset mix.</span>
+<span class="w">    </span><span class="sd">"""A human-readable summary of a dataset mix.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        names: Per-dataset names.</span>
@@ -329,7 +329,7 @@
 <span class="sd">        valid_fraction: ``{key: mean fraction of valid positions}`` (sampled).</span>
 <span class="sd">        class_distributions: ``{target_key: {class_id: count}}`` (sampled).</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">sizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -341,25 +341,25 @@
 <div class="viewcode-block" id="Report.__str__">
 <a class="viewcode-back" href="../../autoapi/omniloader/introspection/index.html#omniloader.introspection.Report.__str__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the report as an aligned text table.&quot;&quot;&quot;</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;OmniLoader dataset report&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">25</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">"""Render the report as an aligned text table."""</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"OmniLoader dataset report"</span><span class="p">,</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">25</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
         <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_keys</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;coverage  </span><span class="si">{</span><span class="s1">&#39;key&#39;</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"coverage  </span><span class="si">{</span><span class="s1">'key'</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">union_keys</span><span class="p">:</span>
-            <span class="n">marks</span> <span class="o">=</span> <span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;  ✓   &quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverage</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;  ·   &quot;</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span>
+            <span class="n">marks</span> <span class="o">=</span> <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">"  ✓   "</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverage</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"  ·   "</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span>
             <span class="p">)</span>
             <span class="n">frac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_fraction</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="n">frac_s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;  valid=</span><span class="si">{</span><span class="n">frac</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">frac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;          </span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">marks</span><span class="si">}{</span><span class="n">frac_s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">frac_s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"  valid=</span><span class="si">{</span><span class="n">frac</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">frac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"          </span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">marks</span><span class="si">}{</span><span class="n">frac_s</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_distributions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">counts</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;classes   </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+            <span class="n">counts</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"classes   </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">counts</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 </div>
 
 
@@ -371,7 +371,7 @@
     <span class="n">schemas</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DatasetSchema</span><span class="p">],</span>
     <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Report</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Summarise a dataset mix into a :class:`Report`.</span>
+<span class="w">    </span><span class="sd">"""Summarise a dataset mix into a :class:`Report`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        datasets: The source datasets.</span>
@@ -382,7 +382,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The populated :class:`Report`.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="n">UnifiedSchema</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">schemas</span><span class="p">))</span>
     <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">_dataset_name</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datasets</span><span class="p">)]</span>
     <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">]</span>  <span class="c1"># type: ignore[arg-type]</span>
@@ -403,11 +403,11 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">max_samples</span><span class="p">)):</span>  <span class="c1"># type: ignore[arg-type]</span>
             <span class="n">sample</span> <span class="o">=</span> <span class="n">unifier</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">union_keys</span><span class="p">:</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span>
                 <span class="n">valid_hits</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
                 <span class="n">valid_total</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">mask</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">int_targets</span><span class="p">:</span>
-                <span class="n">value</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">target</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">_mask&quot;</span><span class="p">]</span>
+                <span class="n">value</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">target</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">_mask"</span><span class="p">]</span>
                 <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="n">mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bool</span><span class="p">()]</span>
                     <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span>
@@ -438,9 +438,9 @@
     <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
     <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that each dataset&#39;s raw samples match its declared specs.</span>
+<span class="w">    </span><span class="sd">"""Check that each dataset's raw samples match its declared specs.</span>
 
-<span class="sd">    For every declared key it verifies the value&#39;s rank and trailing feature</span>
+<span class="sd">    For every declared key it verifies the value's rank and trailing feature</span>
 <span class="sd">    size against the :class:`~omniloader.schema.spec.TensorSpec` (the sequence</span>
 <span class="sd">    length is free — unification pads it). Dtype is not checked because</span>
 <span class="sd">    unification casts it.</span>
@@ -457,7 +457,7 @@
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If ``strict`` and issues were found.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">issues</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">schemas</span><span class="p">)):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">_dataset_name</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
@@ -465,23 +465,23 @@
             <span class="n">sample</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">specs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
-                    <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">]: missing declared key </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">]: missing declared key </span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
                     <span class="k">continue</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
                 <span class="n">expected_ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">value_shape</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">expected_ndim</span><span class="p">:</span>
                     <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">].</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: expected </span><span class="si">{</span><span class="n">expected_ndim</span><span class="si">}</span><span class="s2">D, got </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">].</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: expected </span><span class="si">{</span><span class="n">expected_ndim</span><span class="si">}</span><span class="s2">D, got </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">D"</span>
                     <span class="p">)</span>
                     <span class="k">continue</span>
                 <span class="n">trailing</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">trailing_shape</span>
                 <span class="k">if</span> <span class="n">trailing</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">trailing</span><span class="p">)</span> <span class="p">:]</span> <span class="o">!=</span> <span class="n">trailing</span><span class="p">:</span>
                     <span class="n">got</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">trailing</span><span class="p">)</span> <span class="p">:]</span>
                     <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">].</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: expected trailing shape </span><span class="si">{</span><span class="n">trailing</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">got</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">].</span><span class="si">{</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: expected trailing shape </span><span class="si">{</span><span class="n">trailing</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">got</span><span class="si">}</span><span class="s2">"</span>
                     <span class="p">)</span>
     <span class="k">if</span> <span class="n">strict</span> <span class="ow">and</span> <span class="n">issues</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset validation failed:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">issues</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Dataset validation failed:</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">issues</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">issues</span></div>
 
 </pre></div>

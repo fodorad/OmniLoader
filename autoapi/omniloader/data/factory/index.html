@@ -295,14 +295,14 @@ assemble a dataset mix without Python glue. Only the registered <em>data adapter
 are ever constructed — never models.</p>
 <p>A dataset entry looks like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;adapter&quot;</span><span class="p">:</span> <span class="s2">&quot;hdf5&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;h5_path&quot;</span><span class="p">:</span> <span class="s2">&quot;data/mosei.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;subset&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">},</span>
-  <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;feature_dim&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="s2">&quot;time_dim&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">},</span>
-      <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;eye_image&quot;</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span> <span class="s2">&quot;time_dim&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+  <span class="s2">"adapter"</span><span class="p">:</span> <span class="s2">"hdf5"</span><span class="p">,</span>
+  <span class="s2">"args"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"h5_path"</span><span class="p">:</span> <span class="s2">"data/mosei.h5"</span><span class="p">,</span> <span class="s2">"subset"</span><span class="p">:</span> <span class="s2">"train"</span><span class="p">},</span>
+  <span class="s2">"schema"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"features"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"video"</span><span class="p">,</span> <span class="s2">"feature_dim"</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="s2">"time_dim"</span><span class="p">:</span> <span class="mi">300</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"eye_image"</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span> <span class="s2">"time_dim"</span><span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
     <span class="p">],</span>
-    <span class="s2">&quot;targets&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sentiment&quot;</span><span class="p">,</span> <span class="s2">&quot;placeholder&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">}]</span>
+    <span class="s2">"targets"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="s2">"sentiment"</span><span class="p">,</span> <span class="s2">"placeholder"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">}]</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>

@@ -117,7 +117,7 @@ Module Contents
 
 
    .. py:property:: trailing_shape
-      :type: tuple[int, Ellipsis]
+      :type: tuple[int, ...]
 
 
       The non-time trailing shape, from ``shape`` or ``feature_dim``.
@@ -126,7 +126,7 @@ Module Contents
 
 
    .. py:property:: value_shape
-      :type: tuple[int, Ellipsis]
+      :type: tuple[int, ...]
 
 
       Shape of the placeholder value tensor for a single sample.
@@ -136,7 +136,7 @@ Module Contents
 
 
    .. py:property:: mask_shape
-      :type: tuple[int, Ellipsis]
+      :type: tuple[int, ...]
 
 
       Shape of the boolean validity mask for a single sample.

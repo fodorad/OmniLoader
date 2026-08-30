@@ -37,8 +37,13 @@ Module Contents
    The file is expected to hold a group named ``subset`` (e.g. ``"train"``)
    whose children are per-sample groups, each containing the named value
    datasets (features, targets, masks, metadata). The file handle is opened
-   lazily per worker process so the dataset is safe to use with
-   ``num_workers > 0``.
+   lazily on first read so it *can* be per-process, but an HDF5 handle is not
+   fork-safe: if anything reads a sample (or ``preload=True``) before a
+   ``DataLoader`` forks its workers, every worker inherits the same open
+   handle and reads silently hang. Use ``num_workers > 0`` only with
+   :func:`omniloader.utils.seeding.seed_worker` passed as the DataLoader's
+   ``worker_init_fn`` (OmniLoader's own loader/config helpers already do
+   this), which clears the handle so each worker reopens its own.
 
    :param h5_path: Path to the ``.h5`` file.
    :param subset: Name of the top-level group to read (e.g. ``"train"``).
@@ -71,6 +76,17 @@ Module Contents
    .. py:method:: __getstate__() -> dict[str, Any]
 
       Drop the open file handle and cache when pickling (for workers).
+
+
+
+   .. py:method:: reset_for_worker() -> None
+
+      Drop any inherited file handle and cache so this process reopens its own.
+
+      Called by :func:`omniloader.utils.seeding.seed_worker` (the DataLoader's
+      ``worker_init_fn``) inside each worker, since a ``fork``-started worker
+      inherits the parent's already-open (and not fork-safe) handle directly
+      without going through :meth:`__getstate__`.
 
 
 
