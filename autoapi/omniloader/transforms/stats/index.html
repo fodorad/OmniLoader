@@ -7,7 +7,7 @@
         <link rel="canonical" href="https://fodorad.github.io/OmniLoader/autoapi/omniloader/transforms/stats/index.html">
         <link rel="prefetch" href="../../../../_static/logo.svg" as="image">
 
-    <link rel="shortcut icon" href="../../../../_static/logo.svg"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../../_static/logo.svg"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>omniloader.transforms.stats - OmniLoader latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -303,19 +303,19 @@ only valid (unmasked) positions.</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_feature_stats" title="omniloader.transforms.stats.compute_feature_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_feature_stats</span></code></a>(→ dict[str, tuple[torch.Tensor, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_feature_stats" title="omniloader.transforms.stats.compute_feature_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_feature_stats</span></code></a>(samples, keys[, eps]) → dict[str, tuple[torch.Tensor, torch.Tensor]]</p></td>
 <td><p>Estimate per-feature <code class="docutils literal notranslate"><span class="pre">(mean,</span> <span class="pre">std)</span></code> for each key over valid positions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_stats" title="omniloader.transforms.stats.compute_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_stats</span></code></a>(→ dict[str, dict[str, torch.Tensor]])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_stats" title="omniloader.transforms.stats.compute_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_stats</span></code></a>(samples, keys[, eps]) → dict[str, dict[str, torch.Tensor]]</p></td>
 <td><p>Compute the full statistic set per key, feeding every normalizer variant.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_dataset_stats" title="omniloader.transforms.stats.compute_dataset_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_dataset_stats</span></code></a>(→ dict[str, dict[str, dict[str, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.compute_dataset_stats" title="omniloader.transforms.stats.compute_dataset_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_dataset_stats</span></code></a>(samples, keys[, dataset_key, eps]) → dict[str, dict[str, dict[str, torch.Tensor]]]</p></td>
 <td><p>Compute the full statistic set per key, <strong>grouped by source dataset</strong>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.transforms.stats.save_stats" title="omniloader.transforms.stats.save_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_stats</span></code></a>(→ None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.transforms.stats.save_stats" title="omniloader.transforms.stats.save_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_stats</span></code></a>(stats, path) → None</p></td>
 <td><p>Save a stats mapping to JSON (tensors are stored as nested lists).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.load_stats" title="omniloader.transforms.stats.load_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_stats</span></code></a>(→ dict[str, Any])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.transforms.stats.load_stats" title="omniloader.transforms.stats.load_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_stats</span></code></a>(path) → dict[str, Any]</p></td>
 <td><p>Load a stats mapping saved by <a class="reference internal" href="#omniloader.transforms.stats.save_stats" title="omniloader.transforms.stats.save_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_stats()</span></code></a>, restoring float tensors.</p></td>
 </tr>
 </tbody>

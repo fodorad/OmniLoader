@@ -7,7 +7,7 @@
         <link rel="canonical" href="https://fodorad.github.io/OmniLoader/autoapi/omniloader/sampling/weights/index.html">
         <link rel="prefetch" href="../../../../_static/logo.svg" as="image">
 
-    <link rel="shortcut icon" href="../../../../_static/logo.svg"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../../_static/logo.svg"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
         <title>omniloader.sampling.weights - OmniLoader latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -309,13 +309,13 @@ vector target), matching what a per-position loss actually sees.</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_weights_for_sampler" title="omniloader.sampling.weights.class_weights_for_sampler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_weights_for_sampler</span></code></a>(→ list[float])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_weights_for_sampler" title="omniloader.sampling.weights.class_weights_for_sampler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_weights_for_sampler</span></code></a>(samples, target_key) → list[float]</p></td>
 <td><p>Compute per-sample inverse-class-frequency weights for a <em>sampler</em>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_histogram" title="omniloader.sampling.weights.class_histogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_histogram</span></code></a>(→ torch.Tensor)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_histogram" title="omniloader.sampling.weights.class_histogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_histogram</span></code></a>(samples, target_key[, num_classes]) → torch.Tensor</p></td>
 <td><p>Count valid instances of each class for a categorical target.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_weights_for_loss" title="omniloader.sampling.weights.class_weights_for_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_weights_for_loss</span></code></a>(→ torch.Tensor)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#omniloader.sampling.weights.class_weights_for_loss" title="omniloader.sampling.weights.class_weights_for_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">class_weights_for_loss</span></code></a>(samples, target_key[, ...]) → torch.Tensor</p></td>
 <td><p>Compute per-class weights for a <em>loss</em> from a categorical target.</p></td>
 </tr>
 </tbody>
